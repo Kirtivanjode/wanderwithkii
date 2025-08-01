@@ -1,0 +1,93 @@
+<div class="adventure-container">
+  <div class="center">
+    <h2>Adventures</h2>
+
+    <button
+      *ngIf="isAdmin && !addingNew && !editingId"
+      class="add-adventure-button"
+      (click)="startAddAdventure()"
+    >
+      ➕ Add New Adventure
+    </button>
+  </div>
+  <div class="adventure-list" *ngIf="!addingNew && !editingId">
+    <div
+      *ngFor="let adventure of adventures; trackBy: trackById"
+      class="adventure-card"
+    >
+      <img
+        *ngIf="adventure.imageid"
+        [src]="getImageUrl(adventure.imageid)"
+        alt="Adventure Image"
+        [alt]="adventure.name"
+        width="300"
+        class="adventure-image"
+      />
+
+      <h2 class="adventure-name">{{ adventure.name }}</h2>
+
+      <div class="adventure-details">
+        <h3>{{ adventure.description }}</h3>
+        <p class="location">{{ adventure.location }}</p>
+
+        <div *ngIf="isAdmin" class="admin-buttons">
+          <button class="edit-button" (click)="editAdventure(adventure)">
+            ✏️ Edit
+          </button>
+          <button class="delete-button" (click)="deleteAdventure(adventure.id)">
+            🗑️ Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-container" *ngIf="addingNew || editingId">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <i class="bi bi-x close" (click)="resetForm()"></i>
+
+      <h3>{{ editingId ? "Edit Adventure" : "Add New Adventure" }}</h3>
+
+      <form (submit)="submitForm(); $event.preventDefault()">
+        <label for="description">Name</label>
+        <input
+          id="Name"
+          type="text"
+          [(ngModel)]="form.Name"
+          name="Name"
+          required
+        />
+
+        <label for="description">Description</label>
+        <input
+          id="description"
+          type="text"
+          [(ngModel)]="form.description"
+          name="description"
+          required
+        />
+
+        <label for="location">Location</label>
+        <input
+          id="location"
+          type="text"
+          [(ngModel)]="form.location"
+          name="location"
+          required
+        />
+
+        <label for="image">Image</label>
+        <input
+          id="image"
+          type="file"
+          (change)="onImageSelected($event)"
+          accept="image/*"
+        />
+
+        <button type="submit" class="sum">
+          {{ editingId ? "Update" : "Add" }}
+        </button>
+      </form>
+    </div>
+  </div>
+</div>

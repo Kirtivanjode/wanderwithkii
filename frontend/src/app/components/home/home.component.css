@@ -1,0 +1,222 @@
+html {
+  scroll-behavior: smooth;
+}
+
+.hero {
+  padding: 4rem 2rem;
+  background-color: #f4f1ea;
+  text-align: center;
+  margin-top: 10px;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  height: 400px;
+  color: white;
+  padding: 100px 20px;
+  border-radius: 20px;
+}
+
+.hero-section {
+  height: 100vh; /* or at least 400px */
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  color: white;
+  padding: 2rem;
+}
+
+.hero h1 {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  color: #cfd8b8;
+}
+
+.hero p {
+  font-size: 1.2rem;
+  max-width: 700px;
+  margin: auto;
+  line-height: 1.6;
+}
+
+.destinations {
+  padding: 3rem 2rem;
+  background-color: #fff;
+  color: #333;
+}
+
+.destinations h2 {
+  text-align: center;
+  font-size: 2rem;
+  margin-bottom: 2rem;
+  color: #2e3a23;
+}
+
+.card-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2rem;
+}
+
+.card {
+  background: #fafafa;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  max-width: 300px;
+  transition: transform 0.3s;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+.card img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.card-body {
+  padding: 1rem;
+}
+
+.card-body h3 {
+  margin-top: 0;
+  color: #4e5a3a;
+}
+
+.card-body p {
+  font-size: 0.95rem;
+  color: #555;
+}
+
+section > .d-flex {
+  display: flex;
+  max-width: 960px;
+  margin: 2em auto 3em;
+  gap: 1.5em;
+  padding: 0 1em;
+}
+.my-story-image {
+  flex: 1 1 40%;
+  max-width: 320px;
+  border-radius: 12px;
+  object-fit: cover;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
+}
+.my-story-content {
+  flex: 1 1 55%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  color: #222;
+}
+.my-story-content h2 {
+  margin-top: 0;
+  margin-bottom: 0.5em;
+  font-size: 2rem;
+}
+.my-story-content p {
+  font-size: 1rem;
+  margin-bottom: 1em;
+  color: #444;
+}
+
+.site-footer {
+  background-color: #cfd8b8;
+  color: #333;
+  padding: 1em 1.5em;
+  text-align: center;
+  font-size: 0.9rem;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  box-shadow: inset 0 1px 4px rgba(255, 255, 255, 0.05);
+}
+.site-footer a.footer-link {
+  color: #302f2e;
+  text-decoration: none;
+  font-weight: 600;
+  margin: 0 0.4em;
+  transition: color 0.3s ease;
+}
+.site-footer a.footer-link:hover,
+.site-footer a.footer-link:focus {
+  color: #383736;
+  text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .hero {
+    height: auto;
+    padding: 60px 15px;
+    border-radius: 12px;
+  }
+
+  .hero h1 {
+    font-size: 2rem;
+    color: #cfd8b8;
+  }
+
+  .hero p {
+    font-size: 1rem;
+    max-width: 90%;
+  }
+
+  /* Destinations Cards */
+  .card-container {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .card {
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .card img {
+    height: 180px;
+  }
+
+  /* My Story Section */
+  section > .d-flex {
+    flex-direction: column;
+    max-width: 90%;
+    margin: 2em auto;
+    gap: 1.5em;
+    padding: 0 1em;
+  }
+
+  .my-story-image,
+  .my-story-content {
+    flex: unset;
+    max-width: 100%;
+  }
+
+  .my-story-image {
+    height: auto;
+    margin-bottom: 1rem;
+  }
+
+  .my-story-content h2 {
+    font-size: 1.75rem;
+  }
+
+  .my-story-content p {
+    font-size: 0.95rem;
+  }
+
+  /* Footer */
+  .site-footer {
+    padding: 1em;
+    font-size: 0.85rem;
+  }
+
+  .site-footer a.footer-link {
+    display: inline-block;
+    margin: 0 0.25em;
+    font-size: 0.9rem;
+  }
+}

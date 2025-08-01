@@ -1,0 +1,92 @@
+<header class="navbar" [class.scrolled]="isScrolled">
+  <div class="logo">
+    <img [src]="imageService.getImageUrl(1)" alt="Logo" class="logo-img" />
+    Wander With KI
+  </div>
+
+  <nav class="nav-links">
+    <ng-container *ngIf="isAdmin; else normalLinks">
+      <!-- Admin Links -->
+      <a
+        routerLink="/admin/home"
+        routerLinkActive="active"
+        (click)="logClick('Admin Home')"
+        >Home</a
+      >
+      <a
+        routerLink="/admin/blog"
+        routerLinkActive="active"
+        (click)="logClick('Admin Blog')"
+        >Blog</a
+      >
+      <a
+        routerLink="/admin/adventure"
+        routerLinkActive="active"
+        (click)="logClick('Admin Adventure')"
+        >Adventure</a
+      >
+      <a
+        routerLink="/admin/food"
+        routerLinkActive="active"
+        (click)="logClick('Admin Food')"
+        >Food</a
+      >
+      <a
+        routerLink="/admin/destinations"
+        routerLinkActive="active"
+        (click)="logClick('Admin Destinations')"
+        >Destinations</a
+      >
+    </ng-container>
+
+    <ng-template #normalLinks>
+      <!-- User Links -->
+      <a
+        routerLink="/"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        (click)="logClick('Home')"
+        >Home</a
+      >
+      <a routerLink="/blog" routerLinkActive="active" (click)="logClick('Blog')"
+        >Blog</a
+      >
+      <a
+        routerLink="/adventure"
+        routerLinkActive="active"
+        (click)="logClick('Adventure')"
+        >Adventure</a
+      >
+      <a routerLink="/food" routerLinkActive="active" (click)="logClick('Food')"
+        >Food</a
+      >
+      <a
+        routerLink="/destinations"
+        routerLinkActive="active"
+        (click)="logClick('Destinations')"
+        >Destinations</a
+      >
+    </ng-template>
+
+    <div class="auth-wrapper">
+      <button *ngIf="!isLoggedIn" (click)="openLogin()" class="subscribe">
+        Subscribe
+      </button>
+
+      <div *ngIf="isLoggedIn" class="user-menu">
+        <i class="material-icons">{{
+          isAdmin ? "manage_accounts" : "account_circle"
+        }}</i>
+        {{ username }}
+      </div>
+    </div>
+    <div
+      class="dropdown"
+      *ngIf="authService.isLoggedIn() && !authService.isAdmin()"
+    >
+      <button (click)="openSettings()">
+        <i class="material-icons"> settings</i>
+      </button>
+    </div>
+  </nav>
+</header>

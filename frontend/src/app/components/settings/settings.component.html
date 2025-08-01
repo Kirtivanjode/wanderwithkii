@@ -1,0 +1,153 @@
+<body>
+  <div class="settings-container" [class.collapsed]="!sidebarOpen">
+    <button class="sidebar-toggle" (click)="toggleSidebar()">
+      <i class="material-icons" [class.rotated]="!sidebarOpen">
+        arrow_forward_ios
+      </i>
+    </button>
+
+    <div class="settings-sidebar">
+      <h2>⚙️ Settings</h2>
+      <div
+        class="tab"
+        [class.active]="activeTab === 'personal'"
+        (click)="setActiveTab('personal')"
+      >
+        <span class="tab-icon">👤</span>
+        <span class="tab-label" *ngIf="sidebarOpen">Personal</span>
+      </div>
+
+      <div
+        class="tab"
+        [class.active]="activeTab === 'password'"
+        (click)="setActiveTab('password')"
+      >
+        <span class="tab-icon">🔑</span>
+        <span class="tab-label" *ngIf="sidebarOpen">Password</span>
+      </div>
+
+      <div
+        class="tab"
+        [class.active]="activeTab === 'wishlist'"
+        (click)="setActiveTab('wishlist')"
+      >
+        <span class="tab-icon">📌</span>
+        <span class="tab-label" *ngIf="sidebarOpen">Wishlist</span>
+      </div>
+
+      <div
+        class="tab"
+        [class.active]="activeTab === 'liked'"
+        (click)="setActiveTab('liked')"
+      >
+        <span class="tab-icon">❤️</span>
+        <span class="tab-label" *ngIf="sidebarOpen">Liked Posts</span>
+      </div>
+
+      <div
+        class="tab"
+        [class.active]="activeTab === 'comments'"
+        (click)="setActiveTab('comments')"
+      >
+        <span class="tab-icon">💬</span>
+        <span class="tab-label" *ngIf="sidebarOpen">Comments</span>
+      </div>
+
+      <div class="tab logout-tab" (click)="logout()">
+        <i class="material-icons tab-icon">logout</i>
+        <span class="tab-label" *ngIf="sidebarOpen">Log out</span>
+      </div>
+    </div>
+
+    <div class="settings-content">
+      <div class="tab-content" *ngIf="activeTab === 'personal'">
+        <label>Username:</label>
+        <input [(ngModel)]="user.username" />
+        <label>Email:</label>
+        <input [(ngModel)]="user.email" />
+        <label>Phone:</label>
+        <input [(ngModel)]="user.phone" />
+        <label>Password:</label>
+        <div class="password-input-wrapper">
+          <input
+            [type]="showPassword ? 'text' : 'password'"
+            [(ngModel)]="user.password"
+          />
+          <i
+            class="fa"
+            [ngClass]="showPassword ? 'fa-eye' : 'fa-eye-slash'"
+            (click)="togglePassword()"
+          ></i>
+        </div>
+        <button (click)="saveSettings()">💾 Save Changes</button>
+        <hr />
+        <button (click)="deleteAccount()" class="delete-button">
+          🗑️ Delete My Account
+        </button>
+      </div>
+
+      <div class="tab-content" *ngIf="activeTab === 'password'">
+        <label>Old Password:</label>
+        <input type="password" [(ngModel)]="oldPassword" name="oldPassword" />
+
+        <label>New Password:</label>
+        <input type="password" [(ngModel)]="newPassword" name="newPassword" />
+
+        <label>Confirm Password:</label>
+        <input
+          type="password"
+          [(ngModel)]="confirmPassword"
+          name="confirmPassword"
+        />
+
+        <button (click)="changePassword()">Update Password</button>
+      </div>
+
+      <div class="tab-content" *ngIf="activeTab === 'wishlist'">
+        <h4>🧭 Your Wishlist</h4>
+        <ul>
+          <li
+            *ngFor="let item of wishlist"
+            class="wishlist-item"
+            style="cursor: pointer"
+          >
+            {{ item.emoji }} {{ item.name }} –
+            <strong>{{ item.country }}</strong>
+          </li>
+        </ul>
+      </div>
+
+      <div class="tab-content" *ngIf="activeTab === 'liked'">
+        <h4>❤️ Liked Posts</h4>
+        <ul>
+          <li *ngFor="let post of likedPosts">
+            <strong>{{ post.title }}</strong
+            ><br />
+            <a
+              [routerLink]="['/blog', post.id]"
+              [queryParams]="{ highlight: true }"
+              class="read-more"
+              >🔗 Read More</a
+            >
+          </li>
+        </ul>
+      </div>
+
+      <div *ngIf="activeTab === 'comments'">
+        <h4>💬 Commented Posts</h4>
+        <div class="tab-content comment-content">
+          <div *ngFor="let group of groupedComments" class="comment-card">
+            <strong>{{ group.postTitle }}</strong>
+            <br />
+
+            <div *ngFor="let comment of group.comments">
+              <p>{{ comment.message }}</p>
+              <small>{{ comment.comment_date | date : "medium" }}</small>
+              <hr />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>

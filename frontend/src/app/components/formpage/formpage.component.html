@@ -1,0 +1,68 @@
+<div class="modal-container">
+  <div class="modal">
+    <i class="bi bi-x close" (click)="router.navigateByUrl(returnUrl)"></i>
+    <h3>{{ showLogin ? "Login" : "Sign Up" }}</h3>
+
+    <!-- Login Form -->
+    <form *ngIf="showLogin" #loginForm="ngForm" (ngSubmit)="login()">
+      <input
+        type="text"
+        name="username"
+        [(ngModel)]="loginData.username"
+        placeholder="Username"
+        required
+      />
+      <input
+        type="password"
+        name="password"
+        [(ngModel)]="loginData.password"
+        placeholder="Password"
+        required
+      />
+      <button type="submit" class="sum" [disabled]="!loginForm.valid">
+        Login
+      </button>
+      <button type="button" class="btn" (click)="switchForm()">
+        Don't have account
+      </button>
+    </form>
+
+    <!-- Sign Up Form -->
+    <form *ngIf="!showLogin" #signUpForm="ngForm" (ngSubmit)="signUp()">
+      <input
+        type="text"
+        name="username"
+        [(ngModel)]="signUpData.username"
+        placeholder="Username"
+        required
+      />
+      <input
+        type="password"
+        name="password"
+        [(ngModel)]="signUpData.password"
+        placeholder="Password"
+        required
+      />
+      <input
+        type="email"
+        name="email"
+        [(ngModel)]="signUpData.email"
+        placeholder="Email"
+        required
+      />
+      <input
+        type="text"
+        name="phone"
+        [(ngModel)]="signUpData.phone"
+        placeholder="Phone No"
+        required
+      />
+      <button type="submit" class="sum" [disabled]="!signUpForm.valid">
+        Sign Up
+      </button>
+      <button type="button" class="btn" (click)="switchForm()">
+        Have account
+      </button>
+    </form>
+  </div>
+</div>

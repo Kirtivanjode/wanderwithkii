@@ -1,0 +1,392 @@
+.adventure-container h2 {
+  text-align: center;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: #333;
+  scroll-behavior: smooth;
+}
+
+.center {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+}
+
+.adventure-list {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px 30px;
+  justify-items: center;
+}
+
+.adventure-card {
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  text-align: center;
+  padding: 15px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  min-height: 420px;
+}
+
+.adventure-card:hover {
+  transform: translateY(-10px);
+}
+
+.adventure-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-bottom: 1px solid #ddd;
+}
+
+.adventure-details {
+  padding: 15px;
+  width: 100%;
+  text-align: left;
+}
+
+.adventure-details h3 {
+  font-weight: 700;
+  color: #111;
+  margin-bottom: 10px;
+}
+
+.adventure-details .location {
+  font-style: italic;
+  color: #666;
+  margin-bottom: 15px;
+}
+
+.admin-buttons {
+  position: absolute;
+  bottom: 10px;
+  right: 5px;
+  margin-top: 15px;
+}
+
+.admin-buttons button {
+  border: none;
+  padding: 6px 10px;
+  margin-left: 5px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9em;
+  color: white;
+}
+
+.add-adventure-button {
+  margin: 20px auto;
+  display: inline-block;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 10px 22px;
+  font-size: 1em;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.add-adventure-button:hover {
+  background-color: #45a049;
+}
+
+.adventure-form {
+  max-width: 600px;
+  margin: 20px auto;
+  padding: 15px;
+  background: #fafafa;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  text-align: left;
+}
+
+.adventure-form label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.adventure-form input,
+.adventure-form textarea {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 15px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+  font-size: 1em;
+}
+
+.adventure-form textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.adventure-form button {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  font-size: 1em;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+.adventure-form button:hover {
+  background-color: #45a049;
+}
+
+.adventure-form button.cancel-btn {
+  background-color: #e74c3c;
+}
+
+.adventure-form button.cancel-btn:hover {
+  background-color: #c0392b;
+}
+
+.modal-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal {
+  background-color: #f4f1ea;
+  padding: 2rem;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 400px;
+  height: fit-content;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.modal h3 {
+  font-size: 28px;
+  margin-bottom: 1.5rem;
+  color: #333;
+  font-weight: bold;
+  text-align: center;
+}
+
+.modal label {
+  font-weight: 600;
+  align-self: flex-start;
+  margin-bottom: 0.3rem;
+  color: #333;
+  font-size: 16px;
+  width: 100%;
+}
+
+.modal textarea,
+.modal input[type="text"],
+.modal input[type="file"] {
+  width: 92%;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 16px;
+  font-family: "Segoe UI", sans-serif;
+  transition: border-color 0.3s;
+}
+
+.modal textarea:focus,
+.modal input[type="text"]:focus,
+.modal input[type="file"]:focus {
+  border-color: #cfd8b8;
+  outline: none;
+  background-color: #fefefe;
+}
+
+.image-preview {
+  max-width: 100%;
+  height: auto;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+}
+
+.modal button.sum {
+  background-color: #e0f7fa;
+  color: #000;
+  font-weight: bold;
+  width: 100%;
+  padding: 0.8rem;
+  font-size: 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-bottom: 0.8rem;
+  transition: background-color 0.3s ease;
+}
+
+.modal button.btn {
+  background: none;
+  color: #1a73e8;
+  text-decoration: underline;
+  width: 100%;
+  text-align: center;
+  padding: 0.8rem;
+  font-size: 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-bottom: 0.8rem;
+  transition: color 0.3s ease;
+}
+
+.modal button.btn:hover {
+  color: #0b57d0;
+}
+
+.close {
+  position: absolute;
+  font-size: 32px;
+  color: #4a3434;
+  cursor: pointer;
+  right: 16px;
+  top: 16px;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.edit-button:hover {
+  background-color: #45a049;
+}
+
+.edit-button {
+  background-color: #26c92e;
+}
+.delete-button:hover {
+  background-color: #a04b45;
+}
+
+.delete-button {
+  background-color: #f44336;
+}
+
+@media (max-width: 1024px) {
+  .adventure-list {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .adventure-list {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px 20px;
+  }
+
+  .adventure-card {
+    min-height: 360px;
+    padding: 12px;
+  }
+
+  .adventure-card h3 {
+    font-size: 18px;
+  }
+
+  .adventure-details {
+    padding: 12px;
+  }
+
+  .adventure-image {
+    height: 160px;
+  }
+
+  .add-adventure-button {
+    padding: 10px 16px;
+    font-size: 0.95em;
+  }
+}
+
+@media (max-width: 480px) {
+  .adventure-list {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .adventure-card {
+    min-height: auto;
+    padding: 10px;
+  }
+
+  .adventure-card h3 {
+    font-size: 17px;
+  }
+
+  .adventure-image {
+    height: 150px;
+  }
+
+  .add-adventure-button {
+    width: 100%;
+    font-size: 0.95em;
+  }
+
+  .modal {
+    padding: 1rem;
+    border-radius: 12px;
+    max-width: 95%;
+  }
+
+  .modal h3 {
+    font-size: 22px;
+  }
+
+  .modal textarea,
+  .modal input[type="text"],
+  .modal input[type="file"] {
+    width: 100%;
+    font-size: 15px;
+  }
+
+  .modal button.sum,
+  .modal button.btn {
+    font-size: 15px;
+  }
+
+  .close {
+    font-size: 28px;
+    top: 12px;
+    right: 12px;
+  }
+
+  .adventure-form {
+    padding: 10px;
+    margin: 15px 10px;
+  }
+
+  .adventure-form button {
+    padding: 8px 14px;
+    font-size: 0.95em;
+  }
+
+  .adventure-form input,
+  .adventure-form textarea {
+    font-size: 0.95em;
+  }
+}

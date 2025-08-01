@@ -1,0 +1,118 @@
+<div class="food-container">
+  <div class="center">
+    <h2>Food Items</h2>
+
+    <button
+      *ngIf="isAdmin && !addingNew && editingId === null"
+      class="add-food-button"
+      (click)="startAddFood()"
+    >
+      ➕ Add New Dish
+    </button>
+  </div>
+
+  <div class="food-list" *ngIf="!addingNew && editingId === null">
+    <div *ngFor="let item of foodItems; trackBy: trackById" class="food-card">
+      <img
+        *ngIf="item.ImageId"
+        [src]="getImageUrl(item.ImageId)"
+        alt="Food Image"
+        class="food-image"
+        width="300"
+        height="200"
+      />
+
+      <h4>{{ item.Name }}</h4>
+      <p>{{ item.Description }}</p>
+      <p><b>Location:</b> {{ item.Location }}</p>
+
+      <p>
+        <b>Rating:</b>
+        <span class="stars">
+          <ng-container *ngFor="let star of getStars(); let i = index">
+            <span
+              class="star"
+              [class.filled]="i < item.Rating"
+              (click)="isAdmin ? updateRating(item, i + 1) : null"
+              [class.clickable]="isAdmin"
+              >★</span
+            >
+          </ng-container>
+        </span>
+      </p>
+
+      <div *ngIf="isAdmin" class="admin-buttons">
+        <button class="edit-button" (click)="editFoodItem(item)">
+          ✏️ Edit
+        </button>
+        <button class="delete-button" (click)="deleteFoodItem(item.Id)">
+          🗑️ Delete
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-container" *ngIf="addingNew || editingId !== null">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <i class="bi bi-x close" (click)="resetForm()"></i>
+
+      <h3>{{ editingId !== null ? "Edit Food Item" : "Add New Food Item" }}</h3>
+
+      <form (submit)="submitForm(); $event.preventDefault()">
+        <label for="name">Name</label>
+        <input
+          id="name"
+          type="text"
+          [(ngModel)]="form.name"
+          name="name"
+          required
+          placeholder="Enter food name"
+        />
+
+        <label for="description">Description</label>
+        <input
+          id="description"
+          type="text"
+          [(ngModel)]="form.description"
+          name="description"
+          required
+          placeholder="Enter description"
+        />
+
+        <label for="location">Location</label>
+        <input
+          id="location"
+          type="text"
+          [(ngModel)]="form.location"
+          name="location"
+          required
+          placeholder="Enter location"
+        />
+
+        <label for="rating">Rating</label>
+        <input
+          id="rating"
+          type="number"
+          [(ngModel)]="form.rating"
+          name="rating"
+          min="1"
+          max="5"
+          step="1"
+          required
+        />
+
+        <label for="image">Image</label>
+        <input
+          id="image"
+          type="file"
+          (change)="onImageSelected($event)"
+          accept="image/*"
+        />
+
+        <button type="submit" class="sum">
+          {{ editingId !== null ? "Update" : "Add" }}
+        </button>
+      </form>
+    </div>
+  </div>
+</div>

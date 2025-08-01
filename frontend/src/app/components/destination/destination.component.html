@@ -1,0 +1,83 @@
+<div class="containere">
+  <div class="map-container">
+    <h2>🌏 World Map of Adventures</h2>
+    <div id="map" style="height: 400px"></div>
+  </div>
+
+  <div class="bucket-container">
+    <h2>📋 My Adventure Bucket List</h2>
+
+    <div *ngIf="isAdmin" class="add-form">
+      <input
+        type="text"
+        [(ngModel)]="newBucketItem"
+        placeholder="Adventure name"
+      />
+      <input
+        type="text"
+        [(ngModel)]="newEmoji"
+        maxlength="2"
+        placeholder="Emoji"
+      />
+      <input type="text" [(ngModel)]="newCountry" placeholder="Country" />
+      <button (click)="autoFillCoordinates()">🌐 Auto-Fill Coords</button>
+      <input
+        type="number"
+        [(ngModel)]="newLatitude"
+        placeholder="Latitude"
+        step="any"
+      />
+      <input
+        type="number"
+        [(ngModel)]="newLongitude"
+        placeholder="Longitude"
+        step="any"
+      />
+      <input
+        type="text"
+        [(ngModel)]="newFunFact"
+        name="funFact"
+        placeholder="Fun Fact"
+      />
+      <input
+        type="text"
+        [(ngModel)]="newUniqueThing"
+        name="uniqueThing"
+        placeholder="Unique Thing"
+      />
+      <button (click)="addBucketItem()" [disabled]="isLoading">➕ Add</button>
+    </div>
+
+    <div class="bucket-columns">
+      <div *ngFor="let column of chunkedList">
+        <ul>
+          <li *ngFor="let item of column; trackBy: trackByItemId">
+            <div class="bucket-item">
+              <input
+                type="checkbox"
+                [id]="'bucket-' + item.id"
+                [(ngModel)]="item.completed"
+                (ngModelChange)="toggleItem(item)"
+                [disabled]="!isAdmin"
+              />
+              <label [for]="'bucket-' + item.id">
+                <span [class.checked]="item.completed">
+                  {{ item.emoji }} {{ item.name }}
+                </span>
+              </label>
+              <button
+                *ngIf="isAdmin"
+                class="delete-button"
+                (click)="deleteBucketItem(item.id)"
+                [disabled]="isLoading"
+                title="Delete"
+              >
+                🗑️
+              </button>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

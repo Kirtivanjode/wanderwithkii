@@ -1,0 +1,142 @@
+<!-- Hero Section -->
+<section
+  class="hero"
+  [ngStyle]="{
+    'background-image':
+      'linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url(' +
+      hero.cacheBustedUrl +
+      ')'
+  }"
+>
+  <ng-container *ngIf="hero.isEditing; else viewHero">
+    <input
+      type="text"
+      [(ngModel)]="hero.title"
+      placeholder="Edit Hero Title"
+      style="width: 100%; font-size: 2rem; margin-bottom: 10px"
+    />
+    <textarea
+      [(ngModel)]="hero.description"
+      rows="4"
+      placeholder="Edit Hero Description"
+      style="width: 100%; font-size: 1rem"
+    ></textarea>
+    <input
+      type="file"
+      accept="image/*"
+      (change)="onFileSelected($event, hero)"
+    />
+    <button (click)="saveSection(hero)" style="margin-top: 10px">
+      💾 Save
+    </button>
+    <button
+      *ngIf="hero.id"
+      (click)="deleteSection(hero)"
+      style="margin-left: 10px; margin-top: 10px; color: red"
+    >
+      🗑️ Delete
+    </button>
+  </ng-container>
+
+  <ng-template #viewHero>
+    <h1>{{ hero.title }}</h1>
+    <p>{{ hero.description }}</p>
+    <button *ngIf="isAdmin" (click)="editSection(hero)">✏️ Edit</button>
+  </ng-template>
+</section>
+
+<!-- Popular Destinations Section -->
+<section class="destinations">
+  <h2>Popular Destinations</h2>
+
+  <div class="card-container">
+    <div class="card" *ngFor="let dest of destinations">
+      <img
+        *ngIf="dest.cacheBustedUrl"
+        [src]="dest.cacheBustedUrl"
+        [alt]="dest.title"
+      />
+      <div class="card-body">
+        <ng-container *ngIf="dest.isEditing; else viewDest">
+          <input
+            [(ngModel)]="dest.title"
+            placeholder="Edit Destination Title"
+            style="
+              width: 100%;
+              font-weight: bold;
+              font-size: 1.2rem;
+              margin-bottom: 5px;
+            "
+          />
+          <textarea
+            [(ngModel)]="dest.description"
+            rows="3"
+            placeholder="Edit Description"
+            style="width: 100%"
+          ></textarea>
+          <input
+            type="file"
+            accept="image/*"
+            (change)="onFileSelected($event, dest)"
+          />
+          <button (click)="saveSection(dest)" style="margin-top: 8px">
+            💾 Save
+          </button>
+          <button
+            *ngIf="dest.id"
+            (click)="deleteSection(dest)"
+            style="margin-left: 8px; color: red; margin-top: 8px"
+          >
+            🗑️ Delete
+          </button>
+        </ng-container>
+        <ng-template #viewDest>
+          <h3>{{ dest.title }}</h3>
+          <p>{{ dest.description }}</p>
+          <button *ngIf="isAdmin" (click)="editSection(dest)">✏️ Edit</button>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Story Section -->
+<section>
+  <div class="d-flex">
+    <img [src]="story.cacheBustedUrl" alt="My Journey" class="my-story-image" />
+    <div class="my-story-content">
+      <ng-container *ngIf="story.isEditing; else viewStory">
+        <textarea
+          [(ngModel)]="story.content1"
+          rows="4"
+          placeholder="Edit first paragraph"
+          style="width: 100%; margin-bottom: 10px"
+        ></textarea>
+        <textarea
+          [(ngModel)]="story.content2"
+          rows="4"
+          placeholder="Edit second paragraph"
+          style="width: 100%"
+        ></textarea>
+        <input type="file" (change)="onFileSelected($event, story)" />
+        <button (click)="saveSection(story)" style="margin-top: 10px">
+          💾 Save
+        </button>
+        <button
+          *ngIf="story.id"
+          (click)="deleteSection(story)"
+          style="margin-left: 10px; margin-top: 10px; color: red"
+        >
+          🗑️ Delete
+        </button>
+      </ng-container>
+
+      <ng-template #viewStory>
+        <h2>{{ story.title }}</h2>
+        <p>{{ story.content1 }}</p>
+        <p>{{ story.content2 }}</p>
+        <button *ngIf="isAdmin" (click)="editSection(story)">✏️ Edit</button>
+      </ng-template>
+    </div>
+  </div>
+</section>

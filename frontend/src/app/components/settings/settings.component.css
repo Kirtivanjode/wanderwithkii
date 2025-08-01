@@ -1,0 +1,246 @@
+.settings-container {
+  display: flex;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.sidebar-toggle {
+  position: absolute;
+  top: 20px;
+  left: 250px;
+  background-color: #889171;
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.settings-container:not(.collapsed) .sidebar-toggle {
+  left: 270px;
+}
+
+.settings-container.collapsed .sidebar-toggle {
+  left: 60px;
+}
+
+.settings-sidebar {
+  width: 250px;
+  background-color: #cfd8b8;
+  padding: 20px;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  height: 77vh;
+}
+
+.settings-container.collapsed .settings-sidebar {
+  width: 60px;
+  padding: 20px 10px;
+}
+
+.settings-container.collapsed .settings-sidebar h2 {
+  display: none;
+}
+
+.settings-content {
+  flex: 1;
+  padding: 20px;
+  background-color: #fafafa;
+  overflow-y: auto;
+  height: 77vh;
+}
+
+.material-icons {
+  transition: transform 0.3s ease;
+  display: inline-block;
+  font-size: 24px;
+}
+
+.material-icons.rotated {
+  transform: rotate(180deg);
+}
+
+.tab {
+  padding: 10px 15px;
+  border-radius: 10px;
+  background-color: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+  color: #333;
+  transition: all 0.3s ease;
+  margin-bottom: 10px;
+}
+
+.logout-tab {
+  border-radius: 5px;
+  padding: 10px;
+  margin-top: auto;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.logout-tab .material-icons {
+  font-size: 28px;
+  margin-left: 9px;
+}
+
+.tab:hover {
+  background-color: #dbe8cb;
+}
+
+.tab.active {
+  background-color: #889171;
+  color: white;
+}
+
+.tab-icon {
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.settings-container.collapsed .tab-label {
+  display: none;
+}
+
+.settings-container.collapsed .tab {
+  justify-content: center;
+}
+
+input {
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  width: 100%;
+  margin-bottom: 1rem;
+  box-sizing: border-box;
+  font-size: 1rem;
+}
+
+.password-input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.password-input-wrapper i {
+  position: absolute;
+  top: 37%;
+  right: 6px;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #666;
+}
+
+button {
+  padding: 0.6rem 1.2rem;
+  background-color: #889171;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #d4ddbe;
+}
+
+button:disabled {
+  background-color: #a0aec0;
+  cursor: not-allowed;
+}
+
+.theme-options {
+  display: flex;
+  gap: 1rem;
+  margin-top: 10px;
+}
+
+.theme-options div {
+  padding: 0.5rem 1rem;
+  background-color: #e1e9cd;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.3s ease;
+}
+
+.theme-options div:hover {
+  background-color: #d4ddbe;
+}
+
+.wishlist-item,
+.comment-card {
+  background-color: #fff;
+  padding: 1rem;
+  border-radius: 12px;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+}
+
+.comment-content {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1rem;
+}
+
+.read-more {
+  display: inline-block;
+  margin-top: 0.4rem;
+  color: #d4ddbe;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.read-more:hover {
+  text-decoration: underline;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .sidebar-toggle {
+    display: block;
+  }
+
+  .settings-container {
+    flex-direction: column;
+  }
+
+  .settings-sidebar {
+    width: 100%;
+    border-bottom: 1px solid #ccc;
+  }
+
+  .settings-container.collapsed .settings-sidebar {
+    display: none;
+  }
+
+  .settings-content {
+    padding: 20px;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
