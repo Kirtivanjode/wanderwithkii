@@ -26,7 +26,7 @@
     "@ng-bootstrap/ng-bootstrap": "^16.0.0",
     "bootstrap-icons": "^1.13.1",
     "leaflet": "^1.9.4",
-    "ngx-owl-carousel-o": "^19.0.2",
+    "ngx-owl-carousel-o": "^14.0.0",
     "ngx-toastr": "^19.0.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
