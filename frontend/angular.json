@@ -12,7 +12,6 @@
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:application",
-
           "options": {
             "outputPath": "dist/travel-blog",
             "index": "src/index.html",
