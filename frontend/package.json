@@ -6,7 +6,8 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "postinstall": "npm install --legacy-peer-deps"
   },
   "private": true,
   "dependencies": {
@@ -22,7 +23,7 @@
     "@angular/platform-browser-dynamic": "^17.3.12",
     "@angular/router": "^17.3.12",
     "@fortawesome/fontawesome-free": "^6.7.2",
-    "@ng-bootstrap/ng-bootstrap": "^18.0.0",
+    "@ng-bootstrap/ng-bootstrap": "^15.1.2",
     "bootstrap-icons": "^1.13.1",
     "leaflet": "^1.9.4",
     "ngx-owl-carousel-o": "^19.0.2",
