@@ -193,7 +193,7 @@ app.put("/api/auth/password", async (req, res) => {
   }
 });
 
-aapp.get("/api/posts", async (req, res) => {
+app.get("/api/posts", async (req, res) => {
   const username = req.query.username;
 
   const query = username
