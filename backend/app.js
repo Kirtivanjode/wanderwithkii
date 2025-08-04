@@ -193,68 +193,31 @@ app.put("/api/auth/password", async (req, res) => {
   }
 });
 
-app.get("/api/posts", async (req, res) => {
-  const username = req.query.username;
-
-  const query = username
-    ? `
-    SELECT 
-      bp.id,
-      bp.title,
-      bp.summary,
-      bp.author,
-      bp.post_date,
-      bp.logoId,
-      bp.imageId,
-      bp.likes,
-      li.Name AS logoName,
-      pi.Name AS imageName,
-      (
-        SELECT COUNT(*) 
-        FROM Comments c 
-        WHERE c.post_id = bp.id
-      ) AS commentCount,
-      CASE 
-        WHEN pl.post_id IS NOT NULL THEN true 
-        ELSE false 
-      END AS isLiked
-    FROM BlogPosts bp
-    LEFT JOIN Images li ON bp.logoId = li.Id
-    LEFT JOIN Images pi ON bp.imageId = pi.Id
-    LEFT JOIN PostLikes pl ON pl.post_id = bp.id AND pl.username = $1
-    ORDER BY bp.post_date DESC;
-    `
-    : `
-    SELECT 
-      bp.id,
-      bp.title,
-      bp.summary,
-      bp.author,
-      bp.post_date,
-      bp.logoId,
-      bp.imageId,
-      bp.likes,
-      li.Name AS logoName,
-      pi.Name AS imageName,
-      (
-        SELECT COUNT(*) 
-        FROM Comments c 
-        WHERE c.post_id = bp.id
-      ) AS commentCount
-    FROM BlogPosts bp
-    LEFT JOIN Images li ON bp.logoId = li.Id
-    LEFT JOIN Images pi ON bp.imageId = pi.Id
-    ORDER BY bp.post_date DESC;
-    `;
+aapp.get("/api/posts", async (req, res) => {
+  const { username } = req.query;
 
   try {
-    const result = username
-      ? await pool.query(query, [username])
-      : await pool.query(query);
+    const result = await pool.query(
+      `
+      SELECT 
+        p.*, 
+        COUNT(c.id) AS commentCount,
+        EXISTS (
+          SELECT 1 FROM PostLikes pl
+          WHERE pl.post_id = p.id AND pl.username = $1
+        ) AS isLiked
+      FROM BlogPosts p
+      LEFT JOIN Comments c ON p.id = c.post_id
+      GROUP BY p.id
+      ORDER BY p.post_date DESC
+    `,
+      [username || ""]
+    );
+
     res.json(result.rows);
   } catch (err) {
-    console.error("Failed to fetch posts:", err);
-    res.status(500).json({ error: "Database error" });
+    console.error("Error fetching posts:", err);
+    res.status(500).json({ error: "Failed to fetch posts" });
   }
 });
 
