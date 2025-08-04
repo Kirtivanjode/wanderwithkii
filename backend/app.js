@@ -39,11 +39,10 @@ app.get("/api/images/:id", async (req, res) => {
     }
 
     const imageBuffer = result.rows[0].imagedata;
-    const type = await FileType.fromBuffer(imageBuffer);
+    const type = await FileType.fromBuffer(imageBuffer); // ✅ This works now
 
     const mime = type?.mime || "image/jpeg";
-
-    res.setHeader("content-Type", mime);
+    res.setHeader("Content-Type", mime);
     res.send(imageBuffer);
   } catch (err) {
     console.error("Failed to fetch image:", err);
