@@ -160,7 +160,7 @@ export class BlogComponent implements OnInit, AfterViewInit {
 
   getImageUrl(id: number | null): SafeHtml {
     const rawUrl = id
-      ? `https://wanderwithki.onrender.com/api/images/${id}`
+      ? `https://wanderwithkii-g3wr.onrender.com/api/images/${id}`
       : '';
     return this.sanitizer.bypassSecurityTrustUrl(rawUrl);
   }

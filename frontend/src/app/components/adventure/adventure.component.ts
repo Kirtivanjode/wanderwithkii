@@ -133,7 +133,7 @@ export class AdventureComponent implements OnInit {
 
   getImageUrl(imageId: number | null): SafeHtml {
     const rawUrl = imageId
-      ? `https://wanderwithki.onrender.com/api/images/${imageId}`
+      ? `https://wanderwithkii-g3wr.onrender.com/api/images/${imageId}`
       : '';
     return this.sanitizer.bypassSecurityTrustUrl(rawUrl);
   }

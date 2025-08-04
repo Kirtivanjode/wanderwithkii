@@ -36,8 +36,11 @@ export class FoodComponent implements OnInit {
     imageName: '',
   };
 
-
-  constructor(private blogService: BlogService, private router: Router,private sanitizer: DomSanitizer) {}
+  constructor(
+    private blogService: BlogService,
+    private router: Router,
+    private sanitizer: DomSanitizer
+  ) {}
 
   item = {
     Rating: 3,
@@ -177,7 +180,7 @@ export class FoodComponent implements OnInit {
 
   getImageUrl(imageId: number | null): SafeHtml {
     const rawUrl = imageId
-      ? `https://wanderwithki.onrender.com/api/images/${imageId}`
+      ? `https://wanderwithkii-g3wr.onrender.com/api/images/${imageId}`
       : '';
     return this.sanitizer.bypassSecurityTrustUrl(rawUrl);
   }

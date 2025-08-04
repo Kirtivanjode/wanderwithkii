@@ -37,7 +37,7 @@ export class HomeComponent implements OnInit {
 
   buildImageUrl(imageId: number | null): string {
     return imageId
-      ? `https://wanderwithki.onrender.com/api/images/${imageId}`
+      ? `https://wanderwithkii-g3wr.onrender.com/images/${imageId}`
       : '';
   }
 
