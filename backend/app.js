@@ -30,7 +30,7 @@ app.get("/api/images/:id", async (req, res) => {
   const imageId = parseInt(req.params.id, 10);
   try {
     const result = await pool.query(
-      "SELECT ImageData FROM Images WHERE Id = $1",
+      "SELECT imagedata FROM images WHERE id = $1",
       [imageId]
     );
 
@@ -39,14 +39,19 @@ app.get("/api/images/:id", async (req, res) => {
     }
 
     const imageBuffer = result.rows[0].imagedata;
+    if (!imageBuffer) {
+      return res.status(404).json({ message: "No image data found" });
+    }
+
     const type = await FileType.fromBuffer(imageBuffer);
 
     const mime = type?.mime || "image/jpeg";
+    console.log(`✅ Detected MIME type for image ${imageId}:`, mime);
 
-    res.setHeader("content-Type", mime);
+    res.setHeader("Content-Type", mime);
     res.send(imageBuffer);
   } catch (err) {
-    console.error("Failed to fetch image:", err);
+    console.error("❌ Failed to fetch image:", err.stack);
     res.status(500).json({ message: "Error fetching image" });
   }
 });
