@@ -193,10 +193,11 @@ app.put("/api/auth/password", async (req, res) => {
   }
 });
 
-app.get("/api/posts", async (req, res) => {
+aapp.get("/api/posts", async (req, res) => {
   const username = req.query.username;
 
-  const query = `
+  const query = username
+    ? `
     SELECT 
       bp.id,
       bp.title,
@@ -222,10 +223,34 @@ app.get("/api/posts", async (req, res) => {
     LEFT JOIN Images pi ON bp.imageId = pi.Id
     LEFT JOIN PostLikes pl ON pl.post_id = bp.id AND pl.username = $1
     ORDER BY bp.post_date DESC;
-  `;
+    `
+    : `
+    SELECT 
+      bp.id,
+      bp.title,
+      bp.summary,
+      bp.author,
+      bp.post_date,
+      bp.logoId,
+      bp.imageId,
+      bp.likes,
+      li.Name AS logoName,
+      pi.Name AS imageName,
+      (
+        SELECT COUNT(*) 
+        FROM Comments c 
+        WHERE c.post_id = bp.id
+      ) AS commentCount
+    FROM BlogPosts bp
+    LEFT JOIN Images li ON bp.logoId = li.Id
+    LEFT JOIN Images pi ON bp.imageId = pi.Id
+    ORDER BY bp.post_date DESC;
+    `;
 
   try {
-    const result = await pool.query(query, [username || null]);
+    const result = username
+      ? await pool.query(query, [username])
+      : await pool.query(query);
     res.json(result.rows);
   } catch (err) {
     console.error("Failed to fetch posts:", err);
