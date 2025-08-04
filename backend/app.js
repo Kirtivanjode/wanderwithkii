@@ -28,9 +28,10 @@ const FileType = require("file-type");
 
 app.get("/api/images/:id", async (req, res) => {
   const imageId = parseInt(req.params.id, 10);
+
   try {
     const result = await pool.query(
-      "SELECT ImageData FROM Images WHERE Id = $1",
+      'SELECT "ImageData" FROM "Images" WHERE "Id" = $1',
       [imageId]
     );
 
@@ -38,12 +39,16 @@ app.get("/api/images/:id", async (req, res) => {
       return res.status(404).json({ message: "Image not found" });
     }
 
-    const imageBuffer = result.rows[0].imagedata;
-    const type = await FileType.fromBuffer(imageBuffer);
+    const imageBuffer = result.rows[0].ImageData;
 
+    if (!imageBuffer) {
+      return res.status(404).json({ message: "Image data is empty" });
+    }
+
+    const type = await FileType.fromBuffer(imageBuffer);
     const mime = type?.mime || "image/jpeg";
 
-    res.setHeader("content-Type", mime);
+    res.setHeader("Content-Type", mime);
     res.send(imageBuffer);
   } catch (err) {
     console.error("Failed to fetch image:", err);
