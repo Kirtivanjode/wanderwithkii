@@ -231,7 +231,7 @@ h2 {
 }
 
 .liked {
-  color: crimson;
+  color: rgb(247, 156, 231);
   transition: color 0.3s ease;
 }
 

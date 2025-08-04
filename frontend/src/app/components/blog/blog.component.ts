@@ -136,6 +136,8 @@ export class BlogComponent implements OnInit, AfterViewInit {
       next: (posts: any[]) => {
         this.blogPosts = posts.map((p) => {
           console.log(posts);
+          console.log('Current user:', username); // should print 'heta'
+
           return {
             ...p,
             isLiked: !!p.isLiked, // This is what controls the color

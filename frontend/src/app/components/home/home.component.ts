@@ -35,8 +35,17 @@ export class HomeComponent implements OnInit {
     this.loadSections();
   }
 
-  buildImageUrl(imageId: number | null): SafeUrl | '' {
-    return imageId ? this.homeService.getImageUrl(imageId) : '';
+  buildImageUrl(imageId: number | null): string {
+    return imageId
+      ? `https://wanderwithki.onrender.com/api/images/${imageId}`
+      : '';
+  }
+
+  getBackgroundStyle(imageId: number | null): SafeUrl {
+    const url = this.buildImageUrl(imageId);
+    return this.sanitizer.bypassSecurityTrustStyle(
+      `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('${url}')`
+    );
   }
 
   loadSections() {
@@ -45,7 +54,6 @@ export class HomeComponent implements OnInit {
       next: (sections: any[]) => {
         const mappedSections = sections.map((sec) => {
           const imageid = sec.imageid ?? null;
-
           const section: WebsiteSection = {
             id: sec.id,
             type: (sec.type || '').toLowerCase(),
@@ -57,7 +65,11 @@ export class HomeComponent implements OnInit {
             isEditing: false,
             selectedFile: undefined,
             previewUrl: '',
-            cacheBustedUrl: this.buildImageUrl(imageid),
+            cacheBustedUrl: this.buildImageUrl(imageid), // for <img>
+            backgroundStyle:
+              sec.type?.toLowerCase() === 'hero'
+                ? this.getBackgroundStyle(imageid)
+                : undefined,
           };
 
           return section;

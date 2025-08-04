@@ -6,36 +6,33 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test",
-    "postinstall": "npm install --legacy-peer-deps"
+    "test": "ng test"
   },
   "private": true,
   "dependencies": {
     "@angular/animations": "^17.3.12",
-    "@angular/cdk": "^17.3.10",
+    "@angular/cdk": "^17.2.1",
     "@angular/common": "^17.3.12",
     "@angular/compiler": "^17.3.12",
     "@angular/core": "^17.3.12",
     "@angular/forms": "^17.3.12",
-    "@angular/localize": "^17.3.12",
-    "@angular/material": "^17.3.10",
+    "@angular/material": "^17.2.1",
     "@angular/platform-browser": "^17.3.12",
     "@angular/platform-browser-dynamic": "^17.3.12",
     "@angular/router": "^17.3.12",
+    "@asymmetrik/ngx-leaflet": "^17.0.0",
     "@fortawesome/fontawesome-free": "^6.7.2",
-    "@ng-bootstrap/ng-bootstrap": "^16.0.0",
     "bootstrap-icons": "^1.13.1",
     "leaflet": "^1.9.4",
-    "ngx-owl-carousel-o": "^14.0.0",
-    "ngx-toastr": "^19.0.0",
+    "ngx-owl-carousel-o": "^17.0.0",
+    "ngx-toastr": "^17.0.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
-    "typescript": "^5.3.3",
     "zone.js": "~0.14.0"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "^17.3.17",
-    "@angular/cli": "^17.3.12",
+    "@angular-devkit/build-angular": "^17.3.8",
+    "@angular/cli": "^17.3.8",
     "@angular/compiler-cli": "^17.3.12",
     "@types/jasmine": "~5.1.0",
     "@types/leaflet": "^1.9.18",
@@ -44,10 +41,7 @@
     "karma-chrome-launcher": "~3.2.0",
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
-    "karma-jasmine-html-reporter": "~2.1.0"
-  },
-  "engines": {
-    "node": ">=16.0.0",
-    "npm": ">=8.0.0"
+    "karma-jasmine-html-reporter": "~2.1.0",
+    "typescript": "~5.2.2"
   }
 }

@@ -15,7 +15,7 @@
 //   showFullSummary?: boolean;
 // }
 
-import { SafeUrl } from '@angular/platform-browser';
+import { SafeStyle, SafeUrl } from '@angular/platform-browser';
 
 export interface updateFoodItem {
   id: number;
@@ -66,6 +66,8 @@ export interface WebsiteSection {
   previewUrl?: string;
   isEditing?: boolean;
   cacheBustedUrl?: SafeUrl | '';
+  backgroundStyle?: SafeStyle;
+  imageUrl?: string;
 }
 
 export interface Food {

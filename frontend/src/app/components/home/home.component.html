@@ -1,13 +1,5 @@
 <!-- Hero Section -->
-<section
-  class="hero"
-  [ngStyle]="{
-    'background-image':
-      'linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url(' +
-      hero.cacheBustedUrl +
-      ')'
-  }"
->
+<section class="hero" [style.background-image]="hero.backgroundStyle">
   <ng-container *ngIf="hero.isEditing; else viewHero">
     <input
       type="text"

@@ -13,9 +13,9 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 
 @Injectable({ providedIn: 'root' })
 export class BlogService {
-  private baseUrl = 'https://wanderwithkii-g3wr.onrender.com/api';
+  private baseUrl = ' https://wanderwithki.onrender.com/api';
   // private baseUrl = 'http://localhost:3000/api';
-
+  // private baseUrl = 'http://192.168.1.116:3000/api';
   constructor(private http: HttpClient, private sanitizer: DomSanitizer) {}
 
   login(data: { username: string; password: string }) {
@@ -44,9 +44,13 @@ export class BlogService {
     return this.http.post(`${this.baseUrl}/admin/login`, credentials);
   }
 
-  getImageUrl(id: number | null): SafeUrl {
-    const url = id ? `${this.baseUrl}/images/${id}` : '';
+  getSafeImageUrl(id: number | null): SafeUrl {
+    const url = id ? `https://wanderwithki.onrender.com/api/images/${id}` : '';
     return this.sanitizer.bypassSecurityTrustUrl(url);
+  }
+
+  getImageUrl(id: number | null): string {
+    return id ? `https://wanderwithki.onrender.com/api/images/${id}` : '';
   }
 
   getAllPosts(username?: string): Observable<any[]> {
