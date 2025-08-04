@@ -418,7 +418,7 @@ app.post("/api/comments", async (req, res) => {
   }
 });
 
-app.get("/api/posts/:id/like", async (req, res) => {
+app.post("/api/posts/:id/like", async (req, res) => {
   const postId = parseInt(req.params.id, 10);
   const { username } = req.body;
 
