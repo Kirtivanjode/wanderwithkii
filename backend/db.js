@@ -7,9 +7,9 @@ types.setTypeParser(17, (val) => Buffer.from(val, "hex"));
 
 const pool = new Pool({
   user: "neondb_owner",
-  host: "ep-delicate-poetry-a9p7isx7-pooler.gwc.azure.neon.tech",
+  host: "ep-empty-wave-a1d8z970-pooler.ap-southeast-1.aws.neon.tech",
   database: "neondb",
-  password: "npg_QC3xw5zDKSan",
+  password: "npg_rg1kyFJ2EiUf",
   port: 5432,
   ssl: { rejectUnauthorized: false },
 });

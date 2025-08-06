@@ -26,48 +26,50 @@ const testConnection = async () => {
 testConnection();
 const FileType = require("file-type");
 
-app.get("/api/images/:id", async (req, res) => {
-  const imageId = parseInt(req.params.id, 10);
+app.post("/api/images", upload.single("image"), async (req, res) => {
   try {
-    const result = await pool.query(
-      "SELECT ImageData FROM Images WHERE Id = $1",
-      [imageId]
-    );
-
-    if (result.rows.length === 0) {
-      return res.status(404).json({ message: "Image not found" });
+    const buffer = req.file.buffer;
+    if (!buffer || buffer.length === 0) {
+      return res.status(400).json({ error: "No image uploaded" });
     }
 
-    const imageBuffer = result.rows[0].imagedata;
-    const type = await FileType.fromBuffer(imageBuffer);
-
-    const mime = type?.mime || "image/jpeg";
-
-    res.setHeader("content-Type", mime);
-    res.send(imageBuffer);
+    await pool.query("INSERT INTO images (image_data) VALUES ($1)", [buffer]);
+    res.status(200).json({ message: "Image uploaded successfully" });
   } catch (err) {
-    console.error("Failed to fetch image:", err);
-    res.status(500).json({ message: "Error fetching image" });
+    console.error(err);
+    res.status(500).json({ error: "Error uploading image" });
   }
 });
 
-app.post("/api/images", upload.single("image"), async (req, res) => {
-  const image = req.file?.buffer;
-  const name = req.file?.originalname;
-
-  if (!image || image.length < 10) {
-    return res.status(400).json({ message: "No image provided or too small" });
-  }
-
+app.get("/api/images/:id", async (req, res) => {
   try {
+    const { id } = req.params;
     const result = await pool.query(
-      "INSERT INTO Images (ImageData, Name) VALUES ($1, $2) RETURNING Id",
-      [image, name]
+      'select "id", "name", "imagedata" from "images" order by "images"."id" desc limit 50'
     );
-    res.status(201).json({ message: "Image uploaded", id: result.rows[0].id });
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Image not found" });
+    }
+
+    const buffer = result.rows[0].image_data;
+
+    if (!buffer || buffer.length === 0) {
+      return res.status(400).json({ error: "Image data is empty or invalid" });
+    }
+
+    const type = await fileTypeFromBuffer(buffer);
+
+    if (!type) {
+      console.log("Unknown file type");
+      return res.status(415).json({ error: "Unsupported Media Type" });
+    }
+
+    res.setHeader("Content-Type", type.mime);
+    res.send(buffer);
   } catch (err) {
-    console.error("❌ Upload error:", err.stack);
-    res.status(500).json({ message: "Upload failed", error: err.message });
+    console.error(err);
+    res.status(500).json({ error: "Error fetching image" });
   }
 });
 
