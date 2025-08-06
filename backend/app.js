@@ -45,8 +45,7 @@ app.get("/api/images/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const result = await pool.query(
-      "SELECT imagedata FROM images WHERE id = $1",
-      [id]
+      "SELECT imagedata FROM images WHERE id = $1"
     );
 
     if (result.rows.length === 0) {
