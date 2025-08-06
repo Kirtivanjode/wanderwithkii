@@ -45,7 +45,8 @@ app.get("/api/images/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const result = await pool.query(
-      'select "id", "name", "imagedata" from "images" order by "images"."id" desc limit 50'
+      "SELECT imagedata FROM images WHERE id = $1",
+      [id]
     );
 
     if (result.rows.length === 0) {
