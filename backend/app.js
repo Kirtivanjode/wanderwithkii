@@ -194,8 +194,15 @@ app.put("/api/auth/password", async (req, res) => {
 });
 
 app.get("/api/posts", async (req, res) => {
-  try {
-    const result = await pool.query(`
+  const username = req.query.username;
+
+  const query = username
+    ? `
+      WITH liked_posts AS (
+        SELECT post_id
+        FROM PostLikes
+        WHERE username = $1
+      )
       SELECT 
         bp.id,
         bp.title,
@@ -205,6 +212,35 @@ app.get("/api/posts", async (req, res) => {
         bp.logoId,
         bp.imageId,
         bp.likes,
+        li.Name AS logoName,
+        pi.Name AS imageName,
+        (
+          SELECT COUNT(*) 
+          FROM Comments c 
+          WHERE c.post_id = bp.id
+        ) AS commentCount,
+        CASE 
+          WHEN lp.post_id IS NOT NULL THEN true 
+          ELSE false 
+        END::boolean AS isLiked
+      FROM BlogPosts bp
+      LEFT JOIN Images li ON bp.logoId = li.Id
+      LEFT JOIN Images pi ON bp.imageId = pi.Id
+      LEFT JOIN liked_posts lp ON lp.post_id = bp.id
+      ORDER BY bp.post_date DESC;
+    `
+    : `
+      SELECT 
+        bp.id,
+        bp.title,
+        bp.summary,
+        bp.author,
+        bp.post_date,
+        bp.logoId,
+        bp.imageId,
+        bp.likes,
+        li.Name AS logoName,
+        pi.Name AS imageName,
         (
           SELECT COUNT(*) 
           FROM Comments c 
@@ -213,13 +249,17 @@ app.get("/api/posts", async (req, res) => {
       FROM BlogPosts bp
       LEFT JOIN Images li ON bp.logoId = li.Id
       LEFT JOIN Images pi ON bp.imageId = pi.Id
-      ORDER BY bp.post_date DESC
-    `);
+      ORDER BY bp.post_date DESC;
+    `;
 
+  try {
+    const result = username
+      ? await pool.query(query, [username])
+      : await pool.query(query);
     res.json(result.rows);
   } catch (err) {
-    console.error("Failed to load posts:", err);
-    res.status(500).json({ message: "Failed to load posts" });
+    console.error("Failed to fetch posts:", err);
+    res.status(500).json({ error: "Database error" });
   }
 });
 
