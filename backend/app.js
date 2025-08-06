@@ -26,50 +26,48 @@ const testConnection = async () => {
 testConnection();
 const FileType = require("file-type");
 
-app.post("/api/images", upload.single("image"), async (req, res) => {
-  try {
-    const buffer = req.file.buffer;
-    if (!buffer || buffer.length === 0) {
-      return res.status(400).json({ error: "No image uploaded" });
-    }
-
-    await pool.query("INSERT INTO images (image_data) VALUES ($1)", [buffer]);
-    res.status(200).json({ message: "Image uploaded successfully" });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Error uploading image" });
-  }
-});
-
 app.get("/api/images/:id", async (req, res) => {
+  const imageId = parseInt(req.params.id, 10);
   try {
-    const { id } = req.params;
     const result = await pool.query(
-      "SELECT imagedata FROM images WHERE id = $1"
+      "SELECT ImageData FROM Images WHERE Id = $1",
+      [imageId]
     );
 
     if (result.rows.length === 0) {
-      return res.status(404).json({ error: "Image not found" });
+      return res.status(404).json({ message: "Image not found" });
     }
 
-    const buffer = result.rows[0].image_data;
+    const imageBuffer = result.rows[0].imagedata;
+    const type = await FileType.fromBuffer(imageBuffer);
 
-    if (!buffer || buffer.length === 0) {
-      return res.status(400).json({ error: "Image data is empty or invalid" });
-    }
+    const mime = type?.mime || "image/jpeg";
 
-    const type = await fileTypeFromBuffer(buffer);
-
-    if (!type) {
-      console.log("Unknown file type");
-      return res.status(415).json({ error: "Unsupported Media Type" });
-    }
-
-    res.setHeader("Content-Type", type.mime);
-    res.send(buffer);
+    res.setHeader("content-Type", mime);
+    res.send(imageBuffer);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Error fetching image" });
+    console.error("Failed to fetch image:", err);
+    res.status(500).json({ message: "Error fetching image" });
+  }
+});
+
+app.post("/api/images", upload.single("image"), async (req, res) => {
+  const image = req.file?.buffer;
+  const name = req.file?.originalname;
+
+  if (!image || image.length < 10) {
+    return res.status(400).json({ message: "No image provided or too small" });
+  }
+
+  try {
+    const result = await pool.query(
+      "INSERT INTO Images (ImageData, Name) VALUES ($1, $2) RETURNING Id",
+      [image, name]
+    );
+    res.status(201).json({ message: "Image uploaded", id: result.rows[0].id });
+  } catch (err) {
+    console.error("❌ Upload error:", err.stack);
+    res.status(500).json({ message: "Upload failed", error: err.message });
   }
 });
 
@@ -196,16 +194,8 @@ app.put("/api/auth/password", async (req, res) => {
 });
 
 app.get("/api/posts", async (req, res) => {
-  const { username } = req.query;
-
   try {
-    const result = await pool.query(
-      `
-      WITH liked_posts AS (
-        SELECT post_id
-        FROM PostLikes
-        WHERE username = $1
-      )
+    const result = await pool.query(`
       SELECT 
         bp.id,
         bp.title,
@@ -215,30 +205,21 @@ app.get("/api/posts", async (req, res) => {
         bp.logoId,
         bp.imageId,
         bp.likes,
-        li.Name AS logoName,
-        pi.Name AS imageName,
         (
           SELECT COUNT(*) 
           FROM Comments c 
           WHERE c.post_id = bp.id
-        ) AS commentCount,
-        CASE 
-          WHEN lp.post_id IS NOT NULL THEN true 
-          ELSE false 
-        END AS isLiked
+        ) AS commentCount
       FROM BlogPosts bp
       LEFT JOIN Images li ON bp.logoId = li.Id
       LEFT JOIN Images pi ON bp.imageId = pi.Id
-      LEFT JOIN liked_posts lp ON lp.post_id = bp.id
-      ORDER BY bp.post_date DESC;
-      `,
-      [username || ""]
-    );
+      ORDER BY bp.post_date DESC
+    `);
 
     res.json(result.rows);
   } catch (err) {
-    console.error("Error fetching posts:", err);
-    res.status(500).json({ error: "Failed to fetch posts" });
+    console.error("Failed to load posts:", err);
+    res.status(500).json({ message: "Failed to load posts" });
   }
 });
 
