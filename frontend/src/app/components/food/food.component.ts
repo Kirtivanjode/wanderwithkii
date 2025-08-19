@@ -70,14 +70,14 @@ export class FoodComponent implements OnInit {
     this.blogService.getAllFoodItems().subscribe((data: any[]) => {
       console.log('Fetched Food:', data);
       this.foodItems = data.map((item) => ({
-        Id: item.id,
-        Name: item.name,
-        Description: item.description,
-        Location: item.location,
-        Rating: item.rating,
-        ImageId: item.imageid, // Map backend field to frontend
-        ImageName: item.imagename,
-        ImagePath: item.imagepath,
+        Id: item.Id,
+        Name: item.Name,
+        Description: item.Description,
+        Location: item.Location,
+        Rating: item.Rating,
+        ImageId: item.ImageId,
+        ImageName: item.ImageName,
+        imageBase64: item.imageBase64 || null, // <-- add this
       }));
       this.resetForm();
     });
@@ -179,10 +179,7 @@ export class FoodComponent implements OnInit {
   }
 
   getImageUrl(imageId: number | null): SafeHtml {
-    const rawUrl = imageId
-      ? `https://wanderwithkii-g3wr.onrender.com/api/images/${imageId}`
-      : '';
-    return this.sanitizer.bypassSecurityTrustUrl(rawUrl);
+    return this.blogService.getImageUrl(imageId) as SafeHtml;
   }
 
   trackById(index: number, item: Food): number {

@@ -15,7 +15,7 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 })
 export class HomeComponent implements OnInit {
   isAdmin = false;
-  cacheBustedUrl?: string;
+
   hero: WebsiteSection = { ...defaultSection('hero') };
   story: WebsiteSection = { ...defaultSection('story') };
   destinations: WebsiteSection[] = [];
@@ -35,16 +35,11 @@ export class HomeComponent implements OnInit {
     this.loadSections();
   }
 
-  buildImageUrl(imageId: number | null): string {
-    return imageId
-      ? `https://wanderwithkii-g3wr.onrender.com/images/${imageId}`
-      : '';
-  }
-
-  getBackgroundStyle(imageId: number | null): SafeUrl {
-    const url = this.buildImageUrl(imageId);
+  getBackgroundStyle(imageId: number | null) {
+    if (!imageId) return '';
+    const url = this.homeService.getImageUrl(imageId);
     return this.sanitizer.bypassSecurityTrustStyle(
-      `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('${url}')`
+      `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('${url}')`
     );
   }
 
@@ -53,21 +48,22 @@ export class HomeComponent implements OnInit {
     this.homeService.getSections().subscribe({
       next: (sections: any[]) => {
         const mappedSections = sections.map((sec) => {
-          const imageid = sec.imageid ?? null;
+          const imageid = sec.imageid ?? sec.ImageId ?? null;
+
           const section: WebsiteSection = {
-            id: sec.id,
-            type: (sec.type || '').toLowerCase(),
-            title: sec.title || '',
-            description: sec.description || '',
-            content1: sec.content1 || '',
-            content2: sec.content2 || '',
+            id: sec.id ?? sec.Id,
+            type: (sec.type || sec.Type || '').toLowerCase(),
+            title: sec.title || sec.Title || '',
+            description: sec.description || sec.Description || '',
+            content1: sec.content1 || sec.Content1 || '',
+            content2: sec.content2 || sec.Content2 || '',
             imageid: imageid,
             isEditing: false,
             selectedFile: undefined,
             previewUrl: '',
-            cacheBustedUrl: this.buildImageUrl(imageid), // for <img>
+            cacheBustedUrl: this.homeService.getImageUrl(imageid) as string,
             backgroundStyle:
-              sec.type?.toLowerCase() === 'hero'
+              (sec.type || sec.Type)?.toLowerCase() === 'hero'
                 ? this.getBackgroundStyle(imageid)
                 : undefined,
           };
@@ -75,6 +71,7 @@ export class HomeComponent implements OnInit {
           return section;
         });
 
+        // assign sections to hero, story, destinations
         for (const sec of mappedSections) {
           switch (sec.type) {
             case 'hero':
@@ -126,7 +123,9 @@ export class HomeComponent implements OnInit {
       .subscribe({
         next: (response: any) => {
           section.imageid = response.imageId;
-          section.cacheBustedUrl = this.buildImageUrl(response.imageId);
+          section.cacheBustedUrl = this.homeService.getImageUrl(
+            response.imageId
+          ) as string;
           section.isEditing = false;
           section.selectedFile = undefined;
           section.previewUrl = '';

@@ -100,4 +100,9 @@ export class HeaderComponent implements OnInit {
   logClick(link: string) {
     console.log(`${link} clicked`);
   }
+
+  logout() {
+    this.authService.clearUser();
+    this.router.navigate(['/']);
+  }
 }

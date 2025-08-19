@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { BlogService } from '../../services/blog.service';
-import { ViewEncapsulation } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { AuthService } from '../../services/auth.service';
 
@@ -38,25 +37,7 @@ export class SettingsComponent implements OnInit {
   username: string | null = null;
   groupedComments: any[] = [];
 
-  toggleSidebar() {
-    this.sidebarOpen = !this.sidebarOpen;
-  }
-
-  setActiveTab(tab: string) {
-    this.activeTab = tab;
-    this.showFullSettings = false;
-  }
-
-  goBackToSettings() {
-    this.activeTab = '';
-    this.showFullSettings = true;
-  }
-
   showPassword: boolean = false;
-
-  togglePassword() {
-    this.showPassword = !this.showPassword;
-  }
 
   constructor(
     public blogService: BlogService,
@@ -81,15 +62,33 @@ export class SettingsComponent implements OnInit {
     }
   }
 
+  toggleSidebar() {
+    this.sidebarOpen = !this.sidebarOpen;
+  }
+
+  setActiveTab(tab: string) {
+    this.activeTab = tab;
+    this.showFullSettings = false;
+  }
+
+  goBackToSettings() {
+    this.activeTab = '';
+    this.showFullSettings = true;
+  }
+
+  togglePassword() {
+    this.showPassword = !this.showPassword;
+  }
+
   saveSettings() {
     this.blogService.updateUserSettings(this.user.id, this.user).subscribe({
-      next: (res) => {
+      next: () => {
         sessionStorage.setItem('user', JSON.stringify(this.user));
-        alert('Settings saved to database!');
+        this.toastr.success('Settings saved to database!', 'Success');
       },
       error: (err) => {
         console.error('Update error:', err);
-        alert('Failed to save settings.');
+        this.toastr.error('Failed to save settings.', 'Error');
       },
     });
   }
@@ -111,10 +110,7 @@ export class SettingsComponent implements OnInit {
         },
         error: (err) => {
           console.error('Password update failed', err);
-          this.toastr.error(
-            'Old password incorrect and update failed.',
-            'Error'
-          );
+          this.toastr.error('Old password incorrect, update failed.', 'Error');
         },
       });
   }
@@ -144,18 +140,19 @@ export class SettingsComponent implements OnInit {
     if (confirmed && this.user?.id) {
       this.blogService.deleteAccount(this.user.id).subscribe({
         next: () => {
-          alert('Account deleted successfully');
+          this.toastr.success('Account deleted successfully');
           this.logout(); // Clear session and redirect
         },
         error: () => {
-          alert('Failed to delete account');
+          this.toastr.error('Failed to delete account');
         },
       });
     }
   }
 
   loadUserData() {
-    this.blogService.getUserWishlist(this.user.id).subscribe({
+    // ✅ Wishlist fetched by username
+    this.blogService.getUserWishlist(this.user.username).subscribe({
       next: (res) => {
         console.log('Raw wishlist data:', res);
         this.wishlist = res.map((item: any) => ({
@@ -170,17 +167,18 @@ export class SettingsComponent implements OnInit {
           isWishlist: item.iswishlist ?? true,
           completed: item.completed ?? false,
         }));
-
         console.log('Mapped Wishlist:', this.wishlist);
       },
       error: (err) => console.error('Wishlist fetch error', err),
     });
 
+    // ✅ Liked posts by username
     this.blogService.getLikedPosts(this.user.username).subscribe({
       next: (res) => (this.likedPosts = res),
       error: (err) => console.error('Liked posts fetch error', err),
     });
 
+    // ✅ Comments grouped by post
     this.blogService.getUserComments(this.user.username).subscribe({
       next: (comments) => {
         const groupedMap = new Map<number, any>();

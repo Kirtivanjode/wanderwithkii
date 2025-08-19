@@ -13,8 +13,8 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 
 @Injectable({ providedIn: 'root' })
 export class BlogService {
-  private baseUrl = ' https://wanderwithkii-g3wr.onrender.com/api';
-  // private baseUrl = 'http://localhost:3000/api';
+  // private baseUrl = 'https://wanderwithki.onrender.com/api';
+  private baseUrl = 'http://localhost:3000/api';
   // private baseUrl = 'http://192.168.1.116:3000/api';
   constructor(private http: HttpClient, private sanitizer: DomSanitizer) {}
 
@@ -41,18 +41,10 @@ export class BlogService {
     username: string;
     password: string;
   }): Observable<any> {
-    return this.http.post(`${this.baseUrl}/admin/login`, credentials);
+    return this.http.post(`${this.baseUrl}/admin`, credentials);
   }
-
-  getSafeImageUrl(id: number | null): SafeUrl {
-    const url = id
-      ? `https://wanderwithkii-g3wr.onrender.com/api/images/${id}`
-      : '';
-    return this.sanitizer.bypassSecurityTrustUrl(url);
-  }
-
   getImageUrl(id: number | null): string {
-    return id ? `https://wanderwithkii-g3wr.onrender.com/api/images/${id}` : '';
+    return id ? `${this.baseUrl}/images/${id}` : '';
   }
 
   getAllPosts(username?: string): Observable<any[]> {
@@ -174,25 +166,6 @@ export class BlogService {
     );
   }
 
-  getUserWishlist(userId: number): Observable<BucketListItem[]> {
-    return this.http.get<any[]>(`${this.baseUrl}/wishlist/${userId}`).pipe(
-      map((items) =>
-        items.map((item) => ({
-          id: item.id,
-          name: item.name,
-          completed: false, // or item.completed if exists in DB
-          emoji: item.emoji,
-          latitude: item.latitude,
-          longitude: item.longitude,
-          funFact: item.funfact || '',
-          uniqueThing: item.uniquething || '',
-          country: item.country,
-          isWishlist: true,
-        }))
-      )
-    );
-  }
-
   getAdventures(): Observable<Adventure[]> {
     return this.http.get<Adventure[]>(`${this.baseUrl}/adventures`);
   }
@@ -239,6 +212,27 @@ export class BlogService {
         return { imageId: imageId }; // Return the extracted imageId
       })
     );
+  }
+
+  getUserWishlist(username: string): Observable<BucketListItem[]> {
+    return this.http
+      .get<any[]>(`${this.baseUrl}/wishlist/${encodeURIComponent(username)}`)
+      .pipe(
+        map((items) =>
+          items.map((item) => ({
+            id: item.id,
+            name: item.name,
+            completed: false, // or item.completed if exists in DB
+            emoji: item.emoji,
+            latitude: item.latitude,
+            longitude: item.longitude,
+            funFact: item.funfact || '',
+            uniqueThing: item.uniquething || '',
+            country: item.country,
+            isWishlist: true,
+          }))
+        )
+      );
   }
 
   deleteSection(id: number): Observable<any> {

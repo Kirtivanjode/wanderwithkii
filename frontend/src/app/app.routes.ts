@@ -6,7 +6,7 @@ import { AdventureComponent } from './components/adventure/adventure.component';
 import { FoodComponent } from './components/food/food.component';
 import { FormpageComponent } from './components/formpage/formpage.component';
 import { AdminFormpageComponent } from './components/admin-formpage/admin-formpage.component';
-import { AdminGuard } from './guards/admin.guard';
+import { adminGuard } from './guards/admin.guard';
 import { SettingsComponent } from './components/settings/settings.component';
 
 export const routes: Routes = [
@@ -20,18 +20,18 @@ export const routes: Routes = [
   { path: 'blog/:id', component: BlogComponent },
   { path: 'admin/formpage', component: AdminFormpageComponent },
 
-  { path: 'admin/home', component: HomeComponent, canActivate: [AdminGuard] },
-  { path: 'admin/blog', component: BlogComponent, canActivate: [AdminGuard] },
+  { path: 'admin/home', component: HomeComponent, canActivate: [adminGuard] },
+  { path: 'admin/blog', component: BlogComponent, canActivate: [adminGuard] },
   {
     path: 'admin/adventure',
     component: AdventureComponent,
-    canActivate: [AdminGuard],
+    canActivate: [adminGuard],
   },
-  { path: 'admin/food', component: FoodComponent, canActivate: [AdminGuard] },
+  { path: 'admin/food', component: FoodComponent, canActivate: [adminGuard] },
   {
     path: 'admin/destinations',
     component: DestinationComponent,
-    canActivate: [AdminGuard],
+    canActivate: [adminGuard],
   },
 
   { path: '**', redirectTo: '', pathMatch: 'full' },

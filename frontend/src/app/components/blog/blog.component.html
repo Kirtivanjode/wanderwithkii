@@ -18,8 +18,8 @@
   >
     <div class="d-flex">
       <img
-        *ngIf="post.logoid"
-        [src]="getImageUrl(post.logoid)"
+        *ngIf="post.logoId"
+        [src]="getImageUrl(post.logoId)"
         alt="Logo"
         class="post-logo"
       />
@@ -49,15 +49,17 @@
       </a>
     </p>
 
-    <!-- Optional image under summary -->
-    <div *ngIf="post.showFullSummary && post.imageIds?.length">
+    <div
+      *ngIf="post.showFullSummary && post.imageIds?.length"
+      class="post-images"
+    >
       <img
-        *ngFor="let id of post.imageIds"
-        [src]="getImageUrl(id)"
+        *ngFor="let imgId of post.imageIds"
+        [src]="getImageUrl(imgId)"
         alt="Blog Image"
         width="300"
         height="200"
-        style="margin-right: 10px"
+        style="margin-right: 10px; margin-bottom: 10px"
       />
     </div>
 

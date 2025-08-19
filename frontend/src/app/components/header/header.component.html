@@ -7,34 +7,11 @@
   <nav class="nav-links">
     <ng-container *ngIf="isAdmin; else normalLinks">
       <!-- Admin Links -->
-      <a
-        routerLink="/admin/home"
-        routerLinkActive="active"
-        (click)="logClick('Admin Home')"
-        >Home</a
-      >
-      <a
-        routerLink="/admin/blog"
-        routerLinkActive="active"
-        (click)="logClick('Admin Blog')"
-        >Blog</a
-      >
-      <a
-        routerLink="/admin/adventure"
-        routerLinkActive="active"
-        (click)="logClick('Admin Adventure')"
-        >Adventure</a
-      >
-      <a
-        routerLink="/admin/food"
-        routerLinkActive="active"
-        (click)="logClick('Admin Food')"
-        >Food</a
-      >
-      <a
-        routerLink="/admin/destinations"
-        routerLinkActive="active"
-        (click)="logClick('Admin Destinations')"
+      <a routerLink="/admin/home" routerLinkActive="active">Home</a>
+      <a routerLink="/admin/blog" routerLinkActive="active">Blog</a>
+      <a routerLink="/admin/adventure" routerLinkActive="active">Adventure</a>
+      <a routerLink="/admin/food" routerLinkActive="active">Food</a>
+      <a routerLink="/admin/destinations" routerLinkActive="active"
         >Destinations</a
       >
     </ng-container>
@@ -45,27 +22,12 @@
         routerLink="/"
         routerLinkActive="active"
         [routerLinkActiveOptions]="{ exact: true }"
-        (click)="logClick('Home')"
         >Home</a
       >
-      <a routerLink="/blog" routerLinkActive="active" (click)="logClick('Blog')"
-        >Blog</a
-      >
-      <a
-        routerLink="/adventure"
-        routerLinkActive="active"
-        (click)="logClick('Adventure')"
-        >Adventure</a
-      >
-      <a routerLink="/food" routerLinkActive="active" (click)="logClick('Food')"
-        >Food</a
-      >
-      <a
-        routerLink="/destinations"
-        routerLinkActive="active"
-        (click)="logClick('Destinations')"
-        >Destinations</a
-      >
+      <a routerLink="/blog" routerLinkActive="active">Blog</a>
+      <a routerLink="/adventure" routerLinkActive="active">Adventure</a>
+      <a routerLink="/food" routerLinkActive="active">Food</a>
+      <a routerLink="/destinations" routerLinkActive="active">Destinations</a>
     </ng-template>
 
     <div class="auth-wrapper">
@@ -80,12 +42,24 @@
         {{ username }}
       </div>
     </div>
+
+    <!-- Show Settings for normal users -->
     <div
       class="dropdown"
       *ngIf="authService.isLoggedIn() && !authService.isAdmin()"
     >
       <button (click)="openSettings()">
-        <i class="material-icons"> settings</i>
+        <i class="material-icons">settings</i>
+      </button>
+    </div>
+
+    <!-- Show Logout for admin -->
+    <div
+      class="dropdown"
+      *ngIf="authService.isLoggedIn() && authService.isAdmin()"
+    >
+      <button (click)="logout()">
+        <i class="material-icons">logout</i>
       </button>
     </div>
   </nav>

@@ -10,7 +10,7 @@ import { BlogService } from '../../services/blog.service';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { DomSanitizer, SafeHtml, SafeUrl } from '@angular/platform-browser';
 import { AuthService } from '../../services/auth.service';
 
 interface BlogPost {
@@ -21,7 +21,7 @@ interface BlogPost {
   author: string;
   post_date: string;
   likes: number;
-  logoid?: number;
+  logoId?: number;
   commentCount?: number;
   comments?: number;
   commentList?: Comment[];
@@ -30,6 +30,7 @@ interface BlogPost {
   date?: string;
   likedBy?: string[];
   showFullSummary?: boolean;
+  ImageId?: number;
   imageIds?: number[];
 }
 
@@ -134,35 +135,29 @@ export class BlogComponent implements OnInit, AfterViewInit {
 
     this.blogService.getAllPosts(username).subscribe({
       next: (posts: any[]) => {
-        this.blogPosts = posts.map((p) => {
-          console.log(posts);
-          console.log('Current user:', username); // should print 'heta'
-
-          return {
-            ...p,
-            isLiked: !!p.isLiked, // This is what controls the color
-            likes: p.likes || 0,
-            commentList: p.commentlist || [],
-            comments: parseInt(p.commentcount || '0', 10),
-            showFullSummary: false,
-            showComments: false,
-            imageIds: Array.isArray(p.postImages)
-              ? p.postImages.map((img: any) => img.ImageId)
-              : p.imageid
-              ? [p.imageid]
-              : [],
-          };
-        });
+        console.log(posts);
+        this.blogPosts = posts.map((p) => ({
+          ...p,
+          date: this.datePipe.transform(p.post_date, 'medium') || '',
+          isLiked: !!p.isLiked,
+          likes: p.likes || 0,
+          comments: p.commentCount || 0,
+          commentList: p.commentList || [],
+          showComments: false,
+          showFullSummary: false,
+          imageIds: Array.isArray(p.postImages)
+            ? p.postImages.map((img: any) => img.ImageId)
+            : p.ImageId
+            ? [p.ImageId]
+            : [],
+        }));
       },
       error: (err) => console.error('Error loading posts', err),
     });
   }
 
   getImageUrl(id: number | null): SafeHtml {
-    const rawUrl = id
-      ? `https://wanderwithkii-g3wr.onrender.com/api/images/${id}`
-      : '';
-    return this.sanitizer.bypassSecurityTrustUrl(rawUrl);
+    return this.blogService.getImageUrl(id) as SafeHtml;
   }
 
   getCurrentUsername(): string | null {
@@ -225,9 +220,6 @@ export class BlogComponent implements OnInit, AfterViewInit {
     if (this.form.postImage) {
       formData.append('postImage', this.form.postImage);
     }
-    // if (this.form.logoImage) {
-    //   formData.append('logoImage', this.form.logoImage);
-    // }
 
     this.blogService.createPost(formData).subscribe({
       next: () => {
@@ -335,7 +327,7 @@ export class BlogComponent implements OnInit, AfterViewInit {
             message: trimmedMessage,
           });
           post.comments = post.commentList.length;
-          this.newCommentMap[post.id] = ''; // Clear the input
+          this.newCommentMap[post.id] = '';
         },
         error: (err) => console.error('Failed to add comment', err),
       });
@@ -372,7 +364,6 @@ export class BlogComponent implements OnInit, AfterViewInit {
 
     this.blogService.likePost(postId, username).subscribe({
       next: (res) => {
-        // ✅ Use actual values from backend response
         post.isLiked = res.isLiked;
         post.likes = res.likes;
       },

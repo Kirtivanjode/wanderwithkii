@@ -41,7 +41,6 @@ export class AdminFormpageComponent {
         const userWithRole = { ...res.user, role: 'admin' };
         this.authService.setUser({ ...userWithRole, token: res.token });
 
-        // 🔁 Add a delay to ensure sessionStorage is set
         setTimeout(() => {
           this.router.navigateByUrl(this.returnUrl);
         }, 100);
