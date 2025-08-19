@@ -14,7 +14,7 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 @Injectable({ providedIn: 'root' })
 export class BlogService {
   // private baseUrl = 'https://wanderwithki.onrender.com/api';
-  private baseUrl = 'http://localhost:3000/api';
+  private baseUrl = 'https://backend-btmn.onrender.com/api';
   // private baseUrl = 'http://192.168.1.116:3000/api';
   constructor(private http: HttpClient, private sanitizer: DomSanitizer) {}
 
