@@ -1,25 +1,20 @@
 // db.js
-const sql = require("mssql");
+const { Pool } = require("pg");
 
-const dbConfig = {
-  user: "sa",
-  password: "admin@123",
-  server: "localhost",
-  database: "Travelbolg",
-  options: {
-    encrypt: false,
-    trustServerCertificate: true,
+const pool = new Pool({
+  user: "ki", // your Render PostgreSQL username
+  host: "dpg-d2i2b8p5pdvs73eq3g00-a.oregon-postgres.render.com",
+  database: "kirti_5hp8",
+  password: "9yW1OsqTBTYtlxCqtxrnshr5OawCP7RW",
+  port: 5432,
+  ssl: {
+    rejectUnauthorized: false, // required for Render PostgreSQL
   },
-};
+});
 
-const poolPromise = new sql.ConnectionPool(dbConfig)
+pool
   .connect()
-  .then((pool) => {
-    console.log("Connected to SQL Server");
-    return pool;
-  })
-  .catch((err) => {
-    console.error("Database connection failed:", err);
-  });
+  .then(() => console.log("Connected to PostgreSQL successfully."))
+  .catch((err) => console.error("Database connection failed:", err));
 
-module.exports = { sql, poolPromise };
+module.exports = pool;

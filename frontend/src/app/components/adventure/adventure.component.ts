@@ -55,12 +55,12 @@ export class AdventureComponent implements OnInit {
       console.log('Fetched Adventures:', data);
 
       this.adventures = data.map((item) => ({
-        id: item.Id,
-        name: item.Name,
-        description: item.Description,
-        location: item.Location,
-        imageid: item.ImageId,
-        imageBase64: item.imageBase64 || null, // optional, for direct image use
+        id: item.id,
+        name: item.name,
+        description: item.description,
+        location: item.location,
+        imageid: item.imageid,
+        imageBase64: item.imagebase64 || null,
       }));
 
       this.resetForm();

@@ -70,14 +70,14 @@ export class FoodComponent implements OnInit {
     this.blogService.getAllFoodItems().subscribe((data: any[]) => {
       console.log('Fetched Food:', data);
       this.foodItems = data.map((item) => ({
-        Id: item.Id,
-        Name: item.Name,
-        Description: item.Description,
-        Location: item.Location,
-        Rating: item.Rating,
-        ImageId: item.ImageId,
-        ImageName: item.ImageName,
-        imageBase64: item.imageBase64 || null, // <-- add this
+        Id: item.id, // lowercase from backend
+        Name: item.name,
+        Description: item.description,
+        Location: item.location,
+        Rating: item.rating,
+        ImageId: item.imageid, // lowercase from backend
+        ImageName: item.imagename, // lowercase from backend
+        imageBase64: item.imagebase64 || null,
       }));
       this.resetForm();
     });

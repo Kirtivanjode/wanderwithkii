@@ -21,7 +21,7 @@ interface BlogPost {
   author: string;
   post_date: string;
   likes: number;
-  logoId?: number;
+  logoid?: number;
   commentCount?: number;
   comments?: number;
   commentList?: Comment[];
@@ -145,10 +145,10 @@ export class BlogComponent implements OnInit, AfterViewInit {
           commentList: p.commentList || [],
           showComments: false,
           showFullSummary: false,
-          imageIds: Array.isArray(p.postImages)
-            ? p.postImages.map((img: any) => img.ImageId)
-            : p.ImageId
-            ? [p.ImageId]
+          imageIds: Array.isArray(p.postimages) // lowercase
+            ? p.postimages.map((img: any) => img.imageid)
+            : p.imageid
+            ? [p.imageid]
             : [],
         }));
       },
