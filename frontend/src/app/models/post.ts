@@ -1,20 +1,3 @@
-// export interface BlogPost {
-//   post_date: string | number | Date;
-//   id: number;
-//   title: string;
-//   summary: string;
-//   author: string;
-//   date: string;
-//   logoImageId: number;
-//   postImages: { ImageId: number }[]; // From JSON array of { ImageId }
-//   likes: number;
-//   isLiked: boolean;
-//   comments: number;
-//   commentList?: { username: string; message: string }[];
-//   showComments?: boolean;
-//   showFullSummary?: boolean;
-// }
-
 import { SafeStyle, SafeUrl } from '@angular/platform-browser';
 
 export interface updateFoodItem {

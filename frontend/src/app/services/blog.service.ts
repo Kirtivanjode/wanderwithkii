@@ -7,16 +7,13 @@ import {
   CommentRequest,
   PostLikesResponse,
   WebsiteSection,
-  WishlistDto,
 } from '../models/post';
-import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 
 @Injectable({ providedIn: 'root' })
 export class BlogService {
-  // private baseUrl = 'https://wanderwithki.onrender.com/api';
   private baseUrl = 'https://backend-btmn.onrender.com/api';
-  // private baseUrl = 'http://192.168.1.116:3000/api';
-  constructor(private http: HttpClient, private sanitizer: DomSanitizer) {}
+
+  constructor(private http: HttpClient) {}
 
   login(data: { username: string; password: string }) {
     return this.http.post<{ user: any; role: string }>(`${this.baseUrl}/auth`, {
@@ -104,7 +101,6 @@ export class BlogService {
     );
   }
 
-  // --- Food Items ---
   getAllFoodItems(): Observable<any[]> {
     return this.http.get<any[]>(`${this.baseUrl}/fooditems`);
   }
@@ -125,7 +121,6 @@ export class BlogService {
     return this.http.delete(`${this.baseUrl}/fooditems/${id}`);
   }
 
-  // --- Bucket List ---
   getBucketList(): Observable<BucketListItem[]> {
     return this.http.get<BucketListItem[]>(`${this.baseUrl}/bucketlist`);
   }
@@ -207,9 +202,9 @@ export class BlogService {
 
     return this.http.put(`${this.baseUrl}/home/${id}`, formData).pipe(
       map((response: any) => {
-        console.log('API Response:', response); // Log the entire response for debugging
+        console.log('API Response:', response);
         const imageId = response.imageId;
-        return { imageId: imageId }; // Return the extracted imageId
+        return { imageId: imageId };
       })
     );
   }
@@ -222,7 +217,7 @@ export class BlogService {
           items.map((item) => ({
             id: item.id,
             name: item.name,
-            completed: false, // or item.completed if exists in DB
+            completed: false,
             emoji: item.emoji,
             latitude: item.latitude,
             longitude: item.longitude,

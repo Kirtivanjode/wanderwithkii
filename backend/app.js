@@ -1,8 +1,7 @@
-// app.js (PostgreSQL full version)
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
-const pool = require("./db"); // PostgreSQL pool
+const pool = require("./db");
 const multer = require("multer");
 const { Readable } = require("stream");
 
@@ -13,7 +12,6 @@ app.use(cors());
 app.use(bodyParser.json({ limit: "10mb" }));
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// -------------------- Test DB connection --------------------
 const testConnection = async () => {
   try {
     await pool.query("SELECT 1");
@@ -24,10 +22,8 @@ const testConnection = async () => {
 };
 testConnection();
 
-// -------------------- Helpers --------------------
 const toInt = (v) => (typeof v === "string" ? parseInt(v, 10) : v);
 
-// -------------------- Admin Login --------------------
 app.post("/api/admin", async (req, res) => {
   const { username, password } = req.body;
   try {
@@ -46,7 +42,6 @@ app.post("/api/admin", async (req, res) => {
   }
 });
 
-// -------------------- User Auth --------------------
 app.post("/api/auth", async (req, res) => {
   const { action, username, password, email, phone } = req.body;
   try {
@@ -86,7 +81,6 @@ app.post("/api/auth", async (req, res) => {
   }
 });
 
-// -------------------- Images --------------------
 app.get("/api/images/:id", async (req, res) => {
   try {
     const id = toInt(req.params.id);
@@ -110,7 +104,6 @@ app.get("/api/images/:id", async (req, res) => {
   }
 });
 
-// -------------------- Posts --------------------
 app.get("/api/posts", async (req, res) => {
   const username = req.query.username || null;
   try {
@@ -146,7 +139,6 @@ app.get("/api/posts/:id", async (req, res) => {
   }
 });
 
-// create with optional logoImage + postImage
 app.post(
   "/api/posts",
   upload.fields([{ name: "logoImage" }, { name: "postImage" }]),
@@ -183,12 +175,10 @@ app.post(
       );
 
       await client.query("COMMIT");
-      res
-        .status(201)
-        .json({
-          message: "Post created successfully",
-          postId: result.rows[0].id,
-        });
+      res.status(201).json({
+        message: "Post created successfully",
+        postId: result.rows[0].id,
+      });
     } catch (err) {
       await client.query("ROLLBACK");
       console.error("Error creating post:", err);
@@ -270,7 +260,6 @@ app.delete("/api/posts/:id", async (req, res) => {
   }
 });
 
-// like toggle
 app.post("/api/posts/:id/like", async (req, res) => {
   const id = toInt(req.params.id);
   const { username } = req.body;
@@ -306,7 +295,6 @@ app.post("/api/posts/:id/like", async (req, res) => {
   }
 });
 
-// -------------------- Comments --------------------
 app.get("/api/comments/:postId", async (req, res) => {
   try {
     const postId = toInt(req.params.postId);
@@ -350,7 +338,6 @@ app.delete("/api/comments/:id", async (req, res) => {
   }
 });
 
-// -------------------- Bucket List --------------------
 app.get("/api/bucketlist", async (req, res) => {
   const { completed } = req.query;
   try {
@@ -450,7 +437,6 @@ app.delete("/api/bucketlist/:id", async (req, res) => {
   }
 });
 
-// -------------------- Food Items --------------------
 app.get("/api/fooditems", async (req, res) => {
   try {
     const result = await pool.query(
@@ -543,7 +529,6 @@ app.delete("/api/fooditems/:id", async (req, res) => {
   }
 });
 
-// -------------------- Adventures --------------------
 app.get("/api/adventures", async (req, res) => {
   try {
     const result = await pool.query(
@@ -638,7 +623,6 @@ app.delete("/api/adventures/:id", async (req, res) => {
   }
 });
 
-// -------------------- Home Sections --------------------
 app.get("/api/home", async (req, res) => {
   try {
     const result = await pool.query(
@@ -737,7 +721,6 @@ app.delete("/api/home/:id", async (req, res) => {
   }
 });
 
-// -------------------- Wishlist & Activity --------------------
 app.get("/api/wishlist/:username", async (req, res) => {
   try {
     const result = await pool.query(
