@@ -1,4 +1,3 @@
-<!-- Hero Section -->
 <section class="hero" [style.background-image]="hero.backgroundStyle">
   <ng-container *ngIf="hero.isEditing; else viewHero">
     <input
@@ -37,7 +36,6 @@
   </ng-template>
 </section>
 
-<!-- Popular Destinations Section -->
 <section class="destinations">
   <h2>Popular Destinations</h2>
 
@@ -92,7 +90,6 @@
   </div>
 </section>
 
-<!-- Story Section -->
 <section>
   <div class="d-flex">
     <img [src]="story.cacheBustedUrl" alt="My Journey" class="my-story-image" />

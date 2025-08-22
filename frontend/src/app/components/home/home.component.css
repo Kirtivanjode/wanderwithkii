@@ -17,7 +17,7 @@ html {
 }
 
 .hero-section {
-  height: 100vh; /* or at least 400px */
+  height: 100vh;
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -165,7 +165,6 @@ section > .d-flex {
     max-width: 90%;
   }
 
-  /* Destinations Cards */
   .card-container {
     flex-direction: column;
     gap: 1.5rem;
@@ -180,7 +179,6 @@ section > .d-flex {
     height: 180px;
   }
 
-  /* My Story Section */
   section > .d-flex {
     flex-direction: column;
     max-width: 90%;
@@ -208,7 +206,6 @@ section > .d-flex {
     font-size: 0.95rem;
   }
 
-  /* Footer */
   .site-footer {
     padding: 1em;
     font-size: 0.85rem;

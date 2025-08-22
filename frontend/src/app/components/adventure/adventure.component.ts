@@ -1,4 +1,3 @@
-// adventure.component.ts
 import { Component, OnInit } from '@angular/core';
 import { BlogService } from '../../services/blog.service';
 import { CommonModule } from '@angular/common';
@@ -37,7 +36,6 @@ export class AdventureComponent implements OnInit {
   constructor(
     private blogService: BlogService,
     private router: Router,
-    private sanitizer: DomSanitizer
   ) {}
 
   ngOnInit() {
@@ -100,7 +98,6 @@ export class AdventureComponent implements OnInit {
     if (input.files && input.files[0]) {
       this.form.imageFile = input.files[0];
 
-      // Preview image
       const reader = new FileReader();
       reader.onload = () => {
         this.imagePreview = reader.result;

@@ -141,7 +141,7 @@ export class SettingsComponent implements OnInit {
       this.blogService.deleteAccount(this.user.id).subscribe({
         next: () => {
           this.toastr.success('Account deleted successfully');
-          this.logout(); // Clear session and redirect
+          this.logout();
         },
         error: () => {
           this.toastr.error('Failed to delete account');
@@ -151,7 +151,6 @@ export class SettingsComponent implements OnInit {
   }
 
   loadUserData() {
-    // ✅ Wishlist fetched by username
     this.blogService.getUserWishlist(this.user.username).subscribe({
       next: (res) => {
         console.log('Raw wishlist data:', res);
@@ -172,13 +171,11 @@ export class SettingsComponent implements OnInit {
       error: (err) => console.error('Wishlist fetch error', err),
     });
 
-    // ✅ Liked posts by username
     this.blogService.getLikedPosts(this.user.username).subscribe({
       next: (res) => (this.likedPosts = res),
       error: (err) => console.error('Liked posts fetch error', err),
     });
 
-    // ✅ Comments grouped by post
     this.blogService.getUserComments(this.user.username).subscribe({
       next: (comments) => {
         const groupedMap = new Map<number, any>();

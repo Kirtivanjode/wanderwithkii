@@ -1,4 +1,3 @@
-// food.component.ts
 import { Component, OnInit } from '@angular/core';
 import { BlogService } from '../../services/blog.service';
 import { CommonModule } from '@angular/common';
@@ -61,7 +60,7 @@ export class FoodComponent implements OnInit {
 
     this.isAdmin = user?.role === 'admin' && currentUrl.startsWith('/admin');
 
-    console.log('Admin check:', this.isAdmin, 'URL:', currentUrl); // for debug
+    console.log('Admin check:', this.isAdmin, 'URL:', currentUrl);
 
     this.fetchFoods();
   }
@@ -70,13 +69,13 @@ export class FoodComponent implements OnInit {
     this.blogService.getAllFoodItems().subscribe((data: any[]) => {
       console.log('Fetched Food:', data);
       this.foodItems = data.map((item) => ({
-        Id: item.id, // lowercase from backend
+        Id: item.id,
         Name: item.name,
         Description: item.description,
         Location: item.location,
         Rating: item.rating,
-        ImageId: item.imageid, // lowercase from backend
-        ImageName: item.imagename, // lowercase from backend
+        ImageId: item.imageid,
+        ImageName: item.imagename,
         imageBase64: item.imagebase64 || null,
       }));
       this.resetForm();

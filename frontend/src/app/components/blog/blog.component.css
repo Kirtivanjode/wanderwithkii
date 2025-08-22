@@ -227,7 +227,7 @@ h2 {
 .highlighted-post {
   border: 3px solid #8c846c;
   background-color: #fff3f3;
-  scroll-margin-top: 100px; /* keeps space from top */
+  scroll-margin-top: 100px; 
 }
 
 .liked {

@@ -44,9 +44,9 @@ html {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: space-between; /* NEW */
-  position: relative; /* NEW */
-  min-height: 420px; /* Optional for uniform height */
+  justify-content: space-between;
+  position: relative;
+  min-height: 420px;
   padding-bottom: 60px;
 }
 
@@ -108,7 +108,6 @@ html {
   background-color: #45a049;
 }
 
-/* Modal Overlay */
 .modal-container {
   position: fixed;
   top: 0;

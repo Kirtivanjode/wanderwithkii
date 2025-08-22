@@ -6,7 +6,6 @@
 
   <nav class="nav-links">
     <ng-container *ngIf="isAdmin; else normalLinks">
-      <!-- Admin Links -->
       <a routerLink="/admin/home" routerLinkActive="active">Home</a>
       <a routerLink="/admin/blog" routerLinkActive="active">Blog</a>
       <a routerLink="/admin/adventure" routerLinkActive="active">Adventure</a>
@@ -17,7 +16,6 @@
     </ng-container>
 
     <ng-template #normalLinks>
-      <!-- User Links -->
       <a
         routerLink="/"
         routerLinkActive="active"
@@ -43,7 +41,6 @@
       </div>
     </div>
 
-    <!-- Show Settings for normal users -->
     <div
       class="dropdown"
       *ngIf="authService.isLoggedIn() && !authService.isAdmin()"
@@ -53,7 +50,6 @@
       </button>
     </div>
 
-    <!-- Show Logout for admin -->
     <div
       class="dropdown"
       *ngIf="authService.isLoggedIn() && authService.isAdmin()"

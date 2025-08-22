@@ -71,7 +71,6 @@ export class HomeComponent implements OnInit {
           return section;
         });
 
-        // assign sections to hero, story, destinations
         for (const sec of mappedSections) {
           switch (sec.type) {
             case 'hero':

@@ -70,8 +70,6 @@ export class DestinationComponent implements OnInit, OnDestroy {
           latitude: item.latitude ?? item.Latitude ?? 0,
           longitude: item.longitude ?? item.Longitude ?? 0,
           country: item.country ?? item.Country ?? 'Unknown',
-
-          // ✅ Normalize casing here
           funFact: item.funfact ?? item.funFact ?? item.FunFact ?? '',
           uniqueThing:
             item.uniquething ?? item.uniqueThing ?? item.UniqueThing ?? '',
@@ -237,7 +235,7 @@ export class DestinationComponent implements OnInit, OnDestroy {
               marker.setPopupContent(
                 this.generatePopupContent(item, this.isAdmin)
               );
-              this.bindWishlistStar(marker, item); // Rebind after DOM change
+              this.bindWishlistStar(marker, item);
             },
           });
       });

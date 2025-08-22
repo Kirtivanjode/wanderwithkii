@@ -11,7 +11,6 @@
   z-index: 1000;
 }
 
-/* Modal styling */
 .modal {
   background-color: #f4f1ea;
   padding: 2rem;
@@ -26,7 +25,6 @@
   position: relative;
 }
 
-/* Modal Header */
 .modal h3 {
   font-size: 28px;
   margin-bottom: 1.5rem;
@@ -35,7 +33,6 @@
   text-align: center;
 }
 
-/* Role selection radio buttons */
 .role-selection {
   display: flex;
   justify-content: center;
@@ -53,7 +50,6 @@
   color: #333;
 }
 
-/* Input fields */
 .modal input[type="text"],
 .modal input[type="password"],
 .modal input[type="email"],
@@ -74,7 +70,6 @@
   background-color: #fefefe;
 }
 
-/* Submit button */
 .modal button.sum {
   background-color: #e0f7fa;
   color: #000;
@@ -89,7 +84,6 @@
   transition: background-color 0.3s ease;
 }
 
-/* Switch form link */
 .modal .btn {
   background: none;
   color: #1a73e8;
@@ -109,7 +103,6 @@
   color: #0b57d0;
 }
 
-/* Close icon */
 .close {
   position: absolute;
   font-size: 32px;

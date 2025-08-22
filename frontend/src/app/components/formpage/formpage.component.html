@@ -3,7 +3,6 @@
     <i class="bi bi-x close" (click)="router.navigateByUrl(returnUrl)"></i>
     <h3>{{ showLogin ? "Login" : "Sign Up" }}</h3>
 
-    <!-- Login Form -->
     <form *ngIf="showLogin" #loginForm="ngForm" (ngSubmit)="login()">
       <input
         type="text"
@@ -27,7 +26,6 @@
       </button>
     </form>
 
-    <!-- Sign Up Form -->
     <form *ngIf="!showLogin" #signUpForm="ngForm" (ngSubmit)="signUp()">
       <input
         type="text"

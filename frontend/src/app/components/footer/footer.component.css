@@ -3,7 +3,7 @@
   color: #333;
   padding: 0px 40px;
   font-family: "Segoe UI", sans-serif;
-  margin-top: auto; /* Pushes footer to bottom when content is short */
+  margin-top: auto;
   box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.15);
 }
 

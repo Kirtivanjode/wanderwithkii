@@ -210,7 +210,6 @@ button:disabled {
   text-decoration: underline;
 }
 
-/* Mobile responsive */
 @media (max-width: 768px) {
   .sidebar-toggle {
     display: block;

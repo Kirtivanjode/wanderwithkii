@@ -176,7 +176,6 @@ li label::before {
   transition: background-color 0.3s, border-color 0.3s;
 }
 
-/* Checked state styles */
 input[type="checkbox"]:checked + label::before {
   background-color: #2d6a4f;
   border-color: #2d6a4f;
@@ -193,7 +192,7 @@ input[type="checkbox"]:checked + label::after {
 }
 
 .checked {
-  color: #6c757d; /* muted gray */
+  color: #6c757d;
   text-decoration: line-through;
 }
 
@@ -268,10 +267,9 @@ input[type="checkbox"]:checked + label::after {
 }
 
 .leaflet-popup-tip-container {
-  display: none; /* Remove the default popup tip arrow if you want cleaner look */
+  display: none; 
 }
 
-/* Optional: style the emoji icon markers */
 .emoji-icon {
   font-size: 28px;
   line-height: 1;

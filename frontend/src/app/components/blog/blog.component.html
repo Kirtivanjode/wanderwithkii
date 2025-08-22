@@ -1,15 +1,12 @@
 <div class="blog-container">
-  <!-- Admin Only: Create New Post -->
   <button (click)="openModal()" class="btn btn-primary" *ngIf="isAdmin">
     New Post
   </button>
 
-  <!-- Login prompt -->
   <div *ngIf="loginRequiredMessage" class="alert alert-warning">
     {{ loginRequiredMessage }}
   </div>
 
-  <!-- All Blog Posts -->
   <div
     *ngFor="let post of blogPosts; let i = index"
     class="post-card"
@@ -31,7 +28,6 @@
       By <strong>{{ post.author }}</strong> | {{ post.date }}
     </p>
 
-    <!-- Summary with toggle -->
     <p>
       {{
         post.showFullSummary
@@ -63,7 +59,6 @@
       />
     </div>
 
-    <!-- Actions -->
     <div class="post-actions">
       <button (click)="likePost(post.id)">
         <span [ngClass]="{ liked: post.isLiked, 'not-liked': !post.isLiked }">
@@ -114,8 +109,6 @@
         </button>
       </div>
 
-      <!-- Add comment -->
-      <!-- Add comment -->
       <div class="add-comment">
         <input
           type="text"
@@ -134,7 +127,6 @@
     </div>
   </div>
 
-  <!-- Modal for create/edit -->
   <div class="modal" [class.show]="showModal">
     <div class="modal-content">
       <h3>{{ editingPostId !== null ? "Edit Post" : "New Post" }}</h3>
