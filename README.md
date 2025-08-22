@@ -238,11 +238,6 @@ Issues and PRs are welcome. Please discuss major changes via an issue first.
 
 ---
 
-## 📜 License
-
-Specify a license you prefer (e.g., MIT). If none is specified, “All rights reserved” applies by default.
-
----
 
 ## 📬 Contact
 
