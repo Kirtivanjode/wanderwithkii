@@ -42,6 +42,18 @@ app.post("/api/admin", async (req, res) => {
   }
 });
 
+app.get("/api/auth", async (req, res) => {
+  try {
+    const result = await pool.query(
+      "SELECT id, username, email, phone, role FROM logintable"
+    );
+    res.status(200).json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 app.post("/api/auth", async (req, res) => {
   const { action, username, password, email, phone } = req.body;
   try {
