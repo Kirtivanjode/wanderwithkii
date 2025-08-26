@@ -85,14 +85,18 @@ export class BlogService {
     );
   }
 
-  likePost(
-    postId: number,
-    username: string
-  ): Observable<{ likes: number; isLiked: boolean }> {
-    return this.http.post<{ likes: number; isLiked: boolean }>(
-      `${this.baseUrl}/posts/${postId}/like`,
-      { username }
-    );
+  likePost(postId: number, username: string) {
+    return this.http
+      .post<{ likes: string[]; count: number }>(
+        `${this.baseUrl}/posts/${postId}/like`,
+        { username }
+      )
+      .pipe(
+        map((res) => ({
+          isLiked: res.likes.includes(username),
+          likes: res.count,
+        }))
+      );
   }
 
   getPostLikes(postId: number): Observable<PostLikesResponse> {

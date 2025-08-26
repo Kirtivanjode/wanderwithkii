@@ -273,35 +273,74 @@ app.delete("/api/posts/:id", async (req, res) => {
 });
 
 app.post("/api/posts/:id/like", async (req, res) => {
-  const id = toInt(req.params.id);
+  const postId = toInt(req.params.id);
   const { username } = req.body;
-  if (!username) return res.status(400).json({ message: "username required" });
+
+  if (!username || postId <= 0) {
+    return res.status(400).json({ message: "Invalid post ID or username" });
+  }
+
   const client = await pool.connect();
+
   try {
     await client.query("BEGIN");
+
+    // Check if user already liked the post
     const exists = await client.query(
       `SELECT 1 FROM postlikes WHERE post_id=$1 AND username=$2`,
-      [id, username]
+      [postId, username]
     );
+
+    let liked;
+
     if (exists.rows.length) {
+      // User already liked → remove like
       await client.query(
         `DELETE FROM postlikes WHERE post_id=$1 AND username=$2`,
-        [id, username]
+        [postId, username]
       );
-      await client.query("COMMIT");
-      return res.json({ liked: false });
+      liked = false;
     } else {
+      // Add like
       await client.query(
-        `INSERT INTO postlikes (post_id, username, liked_at) VALUES ($1,$2,NOW())`,
-        [id, username]
+        `INSERT INTO postlikes (post_id, username, liked_at) VALUES ($1, $2, NOW())`,
+        [postId, username]
       );
-      await client.query("COMMIT");
-      return res.json({ liked: true });
+      liked = true;
     }
-  } catch (err) {
+
+    // Get updated total likes
+    const totalLikesResult = await client.query(
+      `SELECT COUNT(*) AS likes FROM postlikes WHERE post_id=$1`,
+      [postId]
+    );
+    const likes = parseInt(totalLikesResult.rows[0].likes, 10);
+
+    await client.query("COMMIT");
+
+    return res.json({ likes, isLiked: liked });
     await client.query("ROLLBACK");
     console.error("Error toggling like:", err);
-    res.status(500).json({ message: "Failed to toggle like" });
+    return res.status(500).json({ message: "Failed to toggle like" });
+  } finally {
+    client.release();
+  }
+});
+
+// Optional: endpoint to fetch likes for a post
+app.get("/api/posts/:id/likes", async (req, res) => {
+  const postId = toInt(req.params.id);
+  const client = await pool.connect();
+  try {
+    const result = await client.query(
+      `SELECT username FROM postlikes WHERE post_id=$1`,
+      [postId]
+    );
+    const likes = result.rows.map((r) => r.username);
+    res.json({ likes, count: likes.length });
+  } catch (err) {
+    console.error("Error fetching likes:", err);
+    res.status(500).json({ message: "Failed to fetch likes" });
   } finally {
     client.release();
   }

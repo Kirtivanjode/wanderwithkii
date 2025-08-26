@@ -9,10 +9,13 @@
   justify-content: center;
   align-items: center;
   z-index: 1000;
+  animation: fadeIn 0.3s ease-in-out;
+  padding: 10px;
+  box-sizing: border-box;
 }
 
 .modal {
-  background-color: #f4f1ea;
+  background-color: white;
   padding: 2rem;
   border-radius: 16px;
   width: 100%;
@@ -23,56 +26,42 @@
   flex-direction: column;
   align-items: center;
   position: relative;
+  animation: slideDown 0.35s ease-out;
+  box-sizing: border-box;
 }
 
 .modal h3 {
-  font-size: 28px;
+  font-size: 26px;
   margin-bottom: 1.5rem;
-  color: #333;
+  color: #000;
   font-weight: bold;
   text-align: center;
 }
 
-.role-selection {
-  display: flex;
-  justify-content: center;
-  gap: 2rem;
-  margin-bottom: 1.5rem;
-  width: 100%;
-}
-
-.role-selection label {
-  font-size: 16px;
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  color: #333;
-}
-
 .modal input[type="text"],
 .modal input[type="password"],
-.modal input[type="email"],
-.modal input[type="tel"] {
-  width: 92%;
+.modal input[type="email"] {
+  width: 90%;
   padding: 0.75rem 1rem;
   margin-bottom: 1rem;
   border: 1px solid #ccc;
   border-radius: 8px;
   font-size: 16px;
   font-family: "Segoe UI", sans-serif;
-  transition: border-color 0.3s;
+  transition: border-color 0.3s, box-shadow 0.3s;
 }
 
 .modal input:focus {
-  border-color: #cfd8b8;
+  border-color: #3a7bd5;
   outline: none;
-  background-color: #fefefe;
+  box-shadow: 0 0 6px rgba(58, 123, 213, 0.4);
+  background-color: #fff;
 }
 
-.modal button.sum {
-  background-color: #e0f7fa;
-  color: #000;
+.modal button.sum,
+.modal button[type="submit"] {
+  background-color: #3a7bd5;
+  color: #fff;
   font-weight: bold;
   width: 100%;
   padding: 0.8rem;
@@ -80,49 +69,84 @@
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  margin-bottom: 0.8rem;
-  transition: background-color 0.3s ease;
+  margin-top: 0.5rem;
+  transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
-.modal .btn {
-  background: none;
-  color: #1a73e8;
-  text-decoration: underline;
-  width: 100%;
-  text-align: center;
-  padding: 0.8rem;
-  font-size: 16px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  margin-bottom: 0.8rem;
-  transition: color 0.3s ease;
-}
-
-.modal .btn:hover {
-  color: #0b57d0;
-}
-
-.close {
-  position: absolute;
-  font-size: 32px;
-  color: #4a3434;
-  cursor: pointer;
-  right: 16px;
-  top: 16px;
-}
-
-.toast-success {
-  background-color: #4caf50;
-}
-
-.toast-error {
-  background-color: #f44336;
+.modal button.sum:hover,
+.modal button[type="submit"]:hover {
+  background-color: #305f92;
+  transform: scale(1.05);
 }
 
 button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.close {
+  position: absolute;
+  font-size: 28px;
+  color: #4a3434;
+  cursor: pointer;
+  right: 16px;
+  top: 16px;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.close:hover {
+  color: #000;
+  transform: scale(1.2) rotate(90deg);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .modal {
+    max-width: 90%;
+    padding: 1.5rem;
+  }
+
+  .modal h3 {
+    font-size: 22px;
+  }
+
+  .modal input[type="text"],
+  .modal input[type="password"],
+  .modal input[type="email"] {
+    width: 89%;
+    font-size: 15px;
+  }
+
+  .modal button.sum,
+  .modal button[type="submit"] {
+    font-size: 15px;
+    padding: 0.7rem;
+  }
+
+  .close {
+    font-size: 24px;
+    top: 12px;
+    right: 12px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -135,28 +159,9 @@ button:disabled {
     font-size: 20px;
   }
 
-  .role-selection {
-    flex-direction: column;
-    align-items: center;
-    gap: 1rem;
-  }
-
-  .modal input[type="text"],
-  .modal input[type="password"],
-  .modal input[type="email"],
-  .modal input[type="tel"] {
-    width: 100%;
-    font-size: 15px;
-  }
-
-  .modal button.sum,
-  .modal .btn {
-    font-size: 15px;
-  }
-
   .close {
-    font-size: 26px;
-    top: 12px;
-    right: 12px;
+    font-size: 22px;
+    top: 8px;
+    right: 8px;
   }
 }

@@ -37,7 +37,6 @@ export class AdminFormpageComponent {
   login() {
     this.blogService.adminlogin(this.loginData).subscribe({
       next: (res) => {
-        console.log('✅ Login success:', res);
         const userWithRole = { ...res.user, role: 'admin' };
         this.authService.setUser({ ...userWithRole, token: res.token });
 
@@ -46,7 +45,7 @@ export class AdminFormpageComponent {
         }, 100);
       },
       error: (err) => {
-        console.error('❌ Login error:', err);
+        console.error('Login error:', err);
         this.toastr.error(err.error?.message || 'Admin login failed');
       },
     });

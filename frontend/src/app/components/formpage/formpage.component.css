@@ -1,150 +1,163 @@
 .modal-container {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: rgba(0, 0, 0, 0.6);
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  height: 100vh;
+  background: #f8f9fa;
+  padding: 10px;
+  box-sizing: border-box;
 }
 
 .modal {
-  background-color: #f4f1ea;
-  padding: 2rem;
-  border-radius: 16px;
-  width: 100%;
-  max-width: 400px;
-  height: fit-content;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  position: relative;
+  max-width: 90%;
+  width: 700px;
+  height: auto;
+  flex-direction: column; /* stack on very small screens */
+}
+
+.form-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
   align-items: center;
   position: relative;
 }
 
-.modal h3 {
-  font-size: 28px;
-  margin-bottom: 1.5rem;
-  color: #333;
-  font-weight: bold;
+.form-card {
+  background: white;
+  padding: 25px 20px;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+  width: 90%;
+  max-width: 350px;
   text-align: center;
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(30px);
+  transition: opacity 0.6s ease,
+    transform 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+  z-index: 1;
 }
 
-.role-selection {
-  display: flex;
-  justify-content: center;
-  gap: 2rem;
-  margin-bottom: 1.5rem;
+.form-card.active {
+  opacity: 1;
+  pointer-events: auto;
+  z-index: 3;
+  transform: translateY(0);
+}
+
+.form-card input {
   width: 100%;
-}
-
-.role-selection label {
-  font-size: 16px;
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  color: #333;
-}
-
-.modal input[type="text"],
-.modal input[type="password"],
-.modal input[type="email"],
-.modal input[type="tel"] {
-  width: 92%;
-  padding: 0.75rem 1rem;
-  margin-bottom: 1rem;
+  padding: 12px;
+  margin-bottom: 15px;
   border: 1px solid #ccc;
   border-radius: 8px;
-  font-size: 16px;
-  font-family: "Segoe UI", sans-serif;
-  transition: border-color 0.3s;
+  font-size: 14px;
+  box-sizing: border-box;
 }
 
-.modal input:focus {
-  border-color: #cfd8b8;
+.form-card input:focus {
   outline: none;
-  background-color: #fefefe;
+  border-color: #3a7bd5;
+  box-shadow: 0 0 4px rgba(58, 123, 213, 0.5);
 }
 
-.modal button.sum {
-  background-color: #e0f7fa;
-  color: #000;
+.form-card button {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  background: #3a7bd5;
+  color: white;
   font-weight: bold;
-  width: 100%;
-  padding: 0.8rem;
-  font-size: 16px;
-  border: none;
-  border-radius: 8px;
   cursor: pointer;
-  margin-bottom: 0.8rem;
-  transition: background-color 0.3s ease;
+  font-size: 15px;
+  transition: background 0.3s ease, transform 0.2s ease;
 }
 
-.modal .btn {
-  background: none;
-  color: #1a73e8;
+.form-card button:hover {
+  background: #305f92;
+  transform: scale(1.05);
+}
+
+.form-card p {
+  margin-top: 12px;
+  font-size: 14px;
+}
+
+.form-card .link {
+  color: #007bff;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.form-card .link:hover {
   text-decoration: underline;
-  width: 100%;
-  text-align: center;
-  padding: 0.8rem;
-  font-size: 16px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  margin-bottom: 0.8rem;
-  transition: color 0.3s ease;
-}
-
-.modal .btn:hover {
-  color: #0b57d0;
 }
 
 .close {
   position: absolute;
-  font-size: 32px;
+  font-size: 28px;
   color: #4a3434;
   cursor: pointer;
-  right: 16px;
-  top: 16px;
+  right: 12px;
+  top: 12px;
+  z-index: 6;
+  transition: transform 0.3s ease;
 }
 
-.toast-success {
-  background-color: #4caf50;
+.close:hover {
+  color: #000;
+  transform: scale(1.2) rotate(90deg);
 }
 
-.toast-error {
-  background-color: #f44336;
-}
+/* === MEDIA QUERIES === */
+@media (max-width: 768px) {
+  .modal {
+    max-width: 95%;
+    gap: 15px;
+  }
 
-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+  .form-card {
+    width: 95%;
+    padding: 20px;
+  }
+
+  .close {
+    font-size: 24px;
+  }
 }
 
 @media (max-width: 480px) {
   .modal {
-    max-width: 90vw;
-    padding: 1rem;
-    border-radius: 12px;
+    gap: 10px;
   }
 
-  .modal h3 {
-    font-size: 22px;
+  .modal-container {
+    height: 60vh;
   }
 
-  .modal input[type="text"],
-  .modal input[type="password"],
-  .modal input[type="email"],
-  .modal input[type="tel"] {
+  .form-card {
     width: 100%;
+    padding: 15px;
   }
 
-  .role-selection {
-    flex-direction: column;
-    gap: 1rem;
+  .form-card h3 {
+    font-size: 18px;
+  }
+
+  .form-card input,
+  .form-card button {
+    font-size: 14px;
+    padding: 10px;
+  }
+
+  .form-card p {
+    font-size: 13px;
   }
 }
