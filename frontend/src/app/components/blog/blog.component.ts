@@ -6,37 +6,34 @@ import {
   ElementRef,
   AfterViewInit,
 } from '@angular/core';
-import { BlogService } from '../../services/blog.service';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { BlogService } from '../../services/blog.service';
 import { AuthService } from '../../services/auth.service';
-
-interface BlogPost {
-  isHighlighted: boolean;
-  id: number;
-  title: string;
-  summary: string;
-  author: string;
-  post_date: string;
-  likes: number;
-  logoid?: number;
-  commentCount?: number;
-  comments?: number;
-  commentList?: Comment[];
-  showComments?: boolean;
-  isLiked?: boolean;
-  date?: string;
-  likedBy?: string[];
-  showFullSummary?: boolean;
-  imageIds?: number[];
-}
 
 interface Comment {
   id: number;
   username: string;
   message: string;
+}
+
+interface BlogPost {
+  id: number;
+  title: string;
+  summary: string;
+  author: string;
+  post_date: string; // raw date from backend
+  date?: string; // formatted for template
+  likes: number;
+  logoid?: number;
+  commentList?: Comment[];
+  comments?: number;
+  isLiked?: boolean;
+  showFullSummary?: boolean;
+  showComments?: boolean;
+  imageIds?: number[];
+  isHighlighted?: boolean;
 }
 
 @Component({
@@ -50,14 +47,15 @@ interface Comment {
 export class BlogComponent implements OnInit, AfterViewInit {
   @ViewChildren('postCard') postCards!: QueryList<ElementRef>;
 
+  blogPosts: BlogPost[] = [];
+  isAdmin = false;
   showModal = false;
   loginRequiredMessage = '';
+  editingPostId: number | null = null;
+  highlightPostId: number | null = null;
+  shouldScrollToHighlight = false;
   newCommentMap: { [postId: number]: string } = {};
 
-  isAdmin = false;
-  editingPostId: number | null = null;
-
-  blogPosts: BlogPost[] = [];
   newPost = {
     title: '',
     author: 'Wander With KI',
@@ -71,42 +69,31 @@ export class BlogComponent implements OnInit, AfterViewInit {
     logoImageName: '',
   };
 
-  highlightPostId: number | null = null;
-  shouldScrollToHighlight = false;
-
   constructor(
-    public blogService: BlogService,
+    private blogService: BlogService,
+    private authService: AuthService,
     private router: Router,
-    private datePipe: DatePipe,
-    private sanitizer: DomSanitizer,
     private route: ActivatedRoute,
-    private authservice: AuthService
+    private datePipe: DatePipe
   ) {}
 
   ngOnInit(): void {
-    const user = JSON.parse(sessionStorage.getItem('user') || '{}');
-    const currentUrl = this.router.url;
-    this.isAdmin = user?.role === 'admin' && currentUrl.startsWith('/admin');
+    const user = this.authService.getUserFromStorage();
+    this.isAdmin =
+      user?.role === 'admin' && this.router.url.startsWith('/admin');
 
     this.route.paramMap.subscribe((paramMap) => {
-      const idParam = paramMap.get('id');
-      const postId = idParam ? +idParam : null;
+      const postId = paramMap.get('id') ? +paramMap.get('id')! : null;
 
       this.route.queryParams.subscribe((params) => {
         const highlight = params['highlight'] === 'true';
-
         if (highlight && postId) {
           this.highlightPostId = postId;
           this.shouldScrollToHighlight = true;
         }
-
         this.loadPosts();
       });
     });
-  }
-
-  getImageUrl(id: number | null): SafeHtml {
-    return this.blogService.getImageUrl(id) as SafeHtml;
   }
 
   ngAfterViewInit(): void {
@@ -123,50 +110,46 @@ export class BlogComponent implements OnInit, AfterViewInit {
       const highlighted = this.postCards.find((el) =>
         el.nativeElement.classList.contains('highlighted-post')
       );
-      if (highlighted) {
-        highlighted.nativeElement.scrollIntoView({
-          behavior: 'smooth',
-          block: 'center',
-        });
-      }
+      highlighted?.nativeElement.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+      });
     }, 100);
   }
 
+  getImageUrl(id: number | null): string {
+    return this.blogService.getImageUrl(id);
+  }
+
   loadPosts(): void {
-    const user = JSON.parse(sessionStorage.getItem('user') || '{}');
-    const username = user?.username;
+    const username = this.authService.getUsername() || undefined;
 
     this.blogService.getAllPosts(username).subscribe({
       next: (posts: any[]) => {
-        this.blogPosts = posts.map((p) => {
-          console.log(posts);
-          return {
-            ...p,
-            isLiked: !!p.isLiked, // This is what controls the color
-            likes: p.likes || 0,
-            commentList: p.commentlist || [],
-            comments: parseInt(p.commentcount || '0', 10),
-            showFullSummary: false,
-            showComments: false,
-            imageIds: Array.isArray(p.postImages)
-              ? p.postImages.map((img: any) => img.ImageId)
-              : p.imageid
-              ? [p.imageid]
-              : [],
-          };
-        });
+        console.log('RAW POSTS FROM BACKEND:', posts);
+
+        this.blogPosts = posts.map((p) => ({
+          ...p,
+          date: this.datePipe.transform(p.post_date, 'medium'), // creates `date` for template
+          isLiked: p.isliked, // use backend boolean
+          likes: p.likes || 0,
+          commentList: [], // initialize empty array
+          comments: p.commentcount || 0, // map backend field
+          showFullSummary: false,
+          showComments: false,
+          imageIds: p.imageid ? [p.imageid] : [], // map single image
+        }));
       },
       error: (err) => console.error('Error loading posts', err),
     });
   }
 
-  getCurrentUsername(): string | null {
-    const user = sessionStorage.getItem('user');
-    return user ? JSON.parse(user).username : null;
+  isLoggedIn(): boolean {
+    return !!this.authService.getUserFromStorage();
   }
 
-  isLoggedIn(): boolean {
-    return !!sessionStorage.getItem('user');
+  getCurrentUsername(): string | null {
+    return this.authService.getUsername();
   }
 
   promptLogin(): void {
@@ -189,20 +172,17 @@ export class BlogComponent implements OnInit, AfterViewInit {
       summary: post.summary,
       author: post.author,
     };
-
-    this.form.postImage = null;
-    this.form.logoImage = null;
-    this.form.postImageName = '';
-    this.form.logoImageName = '';
+    this.form = {
+      postImage: null,
+      logoImage: null,
+      postImageName: '',
+      logoImageName: '',
+    };
     this.showModal = true;
   }
 
   resetForm(): void {
-    this.newPost = {
-      title: '',
-      summary: '',
-      author: 'Wander With KI',
-    };
+    this.newPost = { title: '', summary: '', author: 'Wander With KI' };
     this.form = {
       postImage: null,
       logoImage: null,
@@ -217,12 +197,7 @@ export class BlogComponent implements OnInit, AfterViewInit {
     formData.append('title', this.newPost.title);
     formData.append('summary', this.newPost.summary);
     formData.append('author', this.newPost.author);
-    if (this.form.postImage) {
-      formData.append('postImage', this.form.postImage);
-    }
-    // if (this.form.logoImage) {
-    //   formData.append('logoImage', this.form.logoImage);
-    // }
+    if (this.form.postImage) formData.append('postImage', this.form.postImage);
 
     this.blogService.createPost(formData).subscribe({
       next: () => {
@@ -235,17 +210,14 @@ export class BlogComponent implements OnInit, AfterViewInit {
   }
 
   updatePost(): void {
-    if (this.editingPostId === null) return;
+    if (!this.editingPostId) return;
+
     const formData = new FormData();
     formData.append('title', this.newPost.title);
     formData.append('summary', this.newPost.summary);
     formData.append('author', this.newPost.author);
-    if (this.form.postImage) {
-      formData.append('postImage', this.form.postImage);
-    }
-    if (this.form.logoImage) {
-      formData.append('logoImage', this.form.logoImage);
-    }
+    if (this.form.postImage) formData.append('postImage', this.form.postImage);
+    if (this.form.logoImage) formData.append('logoImage', this.form.logoImage);
 
     this.blogService
       .updatePostWithImages(this.editingPostId, formData)
@@ -264,35 +236,32 @@ export class BlogComponent implements OnInit, AfterViewInit {
 
   deletePost(index: number): void {
     const post = this.blogPosts[index];
-    if (confirm(`Delete post "${post.title}"?`)) {
-      this.blogService.deletePost(post.id).subscribe({
-        next: () => {
-          this.blogPosts.splice(index, 1);
-          alert('Post deleted');
-        },
-        error: (err) => console.error('Delete failed', err),
-      });
-    }
+    if (!confirm(`Delete post "${post.title}"?`)) return;
+
+    this.blogService.deletePost(post.id).subscribe({
+      next: () => this.blogPosts.splice(index, 1),
+      error: (err) => console.error('Delete failed', err),
+    });
   }
 
   onImageSelected(event: Event, type: 'post' | 'logo'): void {
     const input = event.target as HTMLInputElement;
-    if (input.files && input.files[0]) {
-      const file = input.files[0];
-      if (type === 'post') {
-        this.form.postImage = file;
-        this.form.postImageName = file.name;
-      } else {
-        this.form.logoImage = file;
-        this.form.logoImageName = file.name;
-      }
+    if (!input.files?.length) return;
+    const file = input.files[0];
+    if (type === 'post') {
+      this.form.postImage = file;
+      this.form.postImageName = file.name;
+    } else {
+      this.form.logoImage = file;
+      this.form.logoImageName = file.name;
     }
   }
 
   toggleComments(index: number): void {
     const post = this.blogPosts[index];
     post.showComments = !post.showComments;
-    if (post.showComments && post.commentList?.length === 0) {
+
+    if (post.showComments && !post.commentList?.length) {
       this.blogService.getComments(post.id).subscribe({
         next: (comments) => {
           post.commentList = comments;
@@ -309,17 +278,17 @@ export class BlogComponent implements OnInit, AfterViewInit {
       return;
     }
 
-    const trimmedMessage = message.trim();
-    if (!trimmedMessage) return;
+    const trimmed = message.trim();
+    if (!trimmed) return;
 
-    const user = JSON.parse(sessionStorage.getItem('user')!);
+    const user = this.authService.getUserFromStorage();
     const post = this.blogPosts[index];
 
     this.blogService
       .addComment({
         post_id: post.id,
         username: user.username,
-        message: trimmedMessage,
+        message: trimmed,
       })
       .subscribe({
         next: () => {
@@ -327,10 +296,10 @@ export class BlogComponent implements OnInit, AfterViewInit {
           post.commentList.unshift({
             id: 0,
             username: user.username,
-            message: trimmedMessage,
+            message: trimmed,
           });
           post.comments = post.commentList.length;
-          this.newCommentMap[post.id] = ''; // Clear the input
+          this.newCommentMap[post.id] = '';
         },
         error: (err) => console.error('Failed to add comment', err),
       });
@@ -342,20 +311,20 @@ export class BlogComponent implements OnInit, AfterViewInit {
     this.blogService.deleteComment(commentId).subscribe({
       next: () => {
         const post = this.blogPosts.find((p) => p.id === postId);
-        if (post && post.commentList) {
+        if (post?.commentList) {
           post.commentList = post.commentList.filter((c) => c.id !== commentId);
           post.comments = post.commentList.length;
         }
       },
       error: (err) => {
-        console.error('Failed to delete comment:', err);
+        console.error('Failed to delete comment', err);
         alert('Failed to delete comment.');
       },
     });
   }
 
   likePost(postId: number): void {
-    const username = this.authservice.getUsername();
+    const username = this.authService.getUsername();
     if (!username) {
       this.promptLogin();
       return;
@@ -364,17 +333,12 @@ export class BlogComponent implements OnInit, AfterViewInit {
     const post = this.blogPosts.find((p) => p.id === postId);
     if (!post) return;
 
-    // Only call backend if not already liked
-    if (!post.isLiked) {
-      this.blogService.likePost(postId, username).subscribe({
-        next: (res) => {
-          post.isLiked = res.isLiked;
-          post.likes = res.likes;
-        },
-        error: (err) => console.error('Failed to toggle like', err),
-      });
-    } else {
-      console.log('User already liked this post, skipping POST.');
-    }
+    this.blogService.likePost(postId, username).subscribe({
+      next: (res) => {
+        post.isLiked = res.isLiked;
+        post.likes = res.likes;
+      },
+      error: (err) => console.error('Failed to toggle like', err),
+    });
   }
 }

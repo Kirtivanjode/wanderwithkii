@@ -243,9 +243,7 @@ export class DestinationComponent implements OnInit, OnDestroy {
   }
 
   initMap(focusId?: number) {
-    if (this.map) {
-      this.map.remove();
-    }
+    if (this.map) this.map.remove();
 
     this.map = L.map('map', {
       zoomControl: false,
@@ -262,29 +260,48 @@ export class DestinationComponent implements OnInit, OnDestroy {
     }).addTo(this.map);
 
     this.bucketList.forEach((item) => {
-      if (item.latitude && item.longitude) {
-        const marker = L.marker([item.latitude, item.longitude], {
-          icon: L.divIcon({
-            className: 'emoji-icon',
-            html: `<span style="font-size: 24px;">${item.emoji}</span>`,
-          }),
-          draggable: this.isAdmin,
-        }).addTo(this.map);
+      if (!item.latitude || !item.longitude) return;
 
-        marker.bindPopup(this.generatePopupContent(item, this.isAdmin));
+      const marker = L.marker([item.latitude, item.longitude], {
+        icon: L.divIcon({
+          className: 'emoji-icon',
+          html: `<span style="font-size: 24px;">${item.emoji}</span>`,
+        }),
+        draggable: this.isAdmin,
+      }).addTo(this.map);
 
-        marker.on('popupopen', () => {
-          if (!this.isAdmin) {
-            this.bindWishlistStar(marker, item);
-          }
-        });
+      marker.bindPopup(this.generatePopupContent(item, this.isAdmin));
 
-        if (focusId && item.id === focusId) {
-          this.map.setView([item.latitude, item.longitude], 7, {
-            animate: true,
-          });
-          marker.openPopup();
+      marker.on('popupopen', () => {
+        if (!this.isAdmin) {
+          const star = document.querySelector(
+            `.wishlist-star[data-id="${item.id}"]`
+          ) as HTMLElement;
+
+          if (!star) return;
+
+          star.onclick = () => {
+            const newStatus = !item.isWishlist;
+            this.blogService
+              .updateWishlist(this.userId, item.id!, newStatus)
+              .subscribe({
+                next: () => {
+                  item.isWishlist = newStatus;
+                  // Re-render popup content
+                  marker.setPopupContent(
+                    this.generatePopupContent(item, this.isAdmin)
+                  );
+                  // Re-bind click
+                  marker.fire('popupopen');
+                },
+              });
+          };
         }
+      });
+
+      if (focusId && item.id === focusId) {
+        this.map.setView([item.latitude, item.longitude], 7, { animate: true });
+        marker.openPopup();
       }
     });
   }
