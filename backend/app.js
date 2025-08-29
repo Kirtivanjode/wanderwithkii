@@ -273,39 +273,48 @@ app.delete("/api/posts/:id", async (req, res) => {
 });
 
 app.post("/api/posts/:id/like", async (req, res) => {
-  const postId = toInt(req.params.id);
+  const id = toInt(req.params.id);
   const { username } = req.body;
+  if (!username) return res.status(400).json({ message: "username required" });
 
-  if (!username) return res.status(401).json({ message: "Login required" });
-
+  const client = await pool.connect();
   try {
-    // Toggle like
-    const exists = await pool.query(
+    await client.query("BEGIN");
+    const exists = await client.query(
       `SELECT 1 FROM postlikes WHERE post_id=$1 AND username=$2`,
-      [postId, username]
+      [id, username]
     );
-    if (!exists.rows.length) {
-      await pool.query(
-        `INSERT INTO postlikes(post_id, username) VALUES($1,$2)`,
-        [postId, username]
+
+    if (exists.rows.length) {
+      await client.query(
+        `DELETE FROM postlikes WHERE post_id=$1 AND username=$2`,
+        [id, username]
+      );
+    } else {
+      await client.query(
+        `INSERT INTO postlikes (post_id, username, liked_at) VALUES ($1,$2,NOW())`,
+        [id, username]
       );
     }
 
-    const likesResult = await pool.query(
-      `SELECT COUNT(*) AS count FROM postlikes WHERE post_id=$1`,
-      [postId]
+    // get updated likes
+    const likesResult = await client.query(
+      `SELECT username FROM postlikes WHERE post_id=$1`,
+      [id]
     );
-    const likedResult = await pool.query(
-      `SELECT 1 FROM postlikes WHERE post_id=$1 AND username=$2`,
-      [postId, username]
-    );
-    res.json({
-      count: parseInt(likesResult.rows[0].count),
-      isLiked: !!likedResult.rows.length,
+
+    await client.query("COMMIT");
+
+    return res.json({
+      likes: likesResult.rows.map((r) => r.username),
+      count: likesResult.rowCount,
     });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Failed to like post" });
+    await client.query("ROLLBACK");
+    console.error("Error toggling like:", err);
+    res.status(500).json({ message: "Failed to toggle like" });
+  } finally {
+    client.release();
   }
 });
 
@@ -749,36 +758,6 @@ app.get("/api/wishlist/:username", async (req, res) => {
   } catch (err) {
     console.error("Error fetching wishlist:", err);
     res.status(500).send("Server error fetching wishlist");
-  }
-});
-
-// Toggle wishlist status
-app.put("/api/bucketlist/wishlist", async (req, res) => {
-  const { userId, itemId, status } = req.body;
-
-  if (!userId || !itemId || typeof status !== "boolean") {
-    return res.status(400).json({ message: "Missing required fields" });
-  }
-
-  try {
-    if (status) {
-      // Add to wishlist
-      await pool.query(
-        `INSERT INTO userwishlist (userid, bucketitemid) VALUES ($1, $2) ON CONFLICT DO NOTHING`,
-        [userId, itemId]
-      );
-    } else {
-      // Remove from wishlist
-      await pool.query(
-        `DELETE FROM userwishlist WHERE userid=$1 AND bucketitemid=$2`,
-        [userId, itemId]
-      );
-    }
-
-    res.json({ message: "Wishlist updated successfully" });
-  } catch (err) {
-    console.error("Error updating wishlist:", err);
-    res.status(500).json({ message: "Failed to update wishlist" });
   }
 });
 
