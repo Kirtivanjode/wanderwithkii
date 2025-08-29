@@ -735,7 +735,8 @@ app.delete("/api/home/:id", async (req, res) => {
   }
 });
 
-app.get("/api/wishlist/:username", async (req, res) => {
+app.get("/api/bucketlist/wishlist/:username", async (req, res) => {
+  const username = req.params.username;
   try {
     const result = await pool.query(
       `SELECT b.id, b.name, b.country, b.latitude, b.longitude, b.emoji, b.funfact, b.uniquething
@@ -743,7 +744,7 @@ app.get("/api/wishlist/:username", async (req, res) => {
        INNER JOIN adventurebucketlist b ON uw.bucketitemid = b.id
        INNER JOIN logintable u ON uw.userid = u.id
        WHERE u.username = $1`,
-      [req.params.username]
+      [username]
     );
     res.json(result.rows);
   } catch (err) {
@@ -752,7 +753,27 @@ app.get("/api/wishlist/:username", async (req, res) => {
   }
 });
 
-// Toggle wishlist status
+app.post("/api/bucketlist/wishlist", async (req, res) => {
+  const { userId, bucketItemId, isWishlist } = req.body;
+  try {
+    if (isWishlist) {
+      await pool.query(
+        "INSERT INTO wishlist (user_id, bucketlist_id) VALUES ($1, $2) ON CONFLICT DO NOTHING",
+        [userId, bucketItemId]
+      );
+    } else {
+      await pool.query(
+        "DELETE FROM wishlist WHERE user_id=$1 AND bucketlist_id=$2",
+        [userId, bucketItemId]
+      );
+    }
+    res.json({ success: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to update wishlist" });
+  }
+});
+
 app.put("/api/bucketlist/wishlist", async (req, res) => {
   const { userId, itemId, status } = req.body;
 

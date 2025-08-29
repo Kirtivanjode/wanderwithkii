@@ -17,7 +17,7 @@ import { BucketListItem } from '../../models/post';
   styleUrls: ['./destination.component.css'],
 })
 export class DestinationComponent implements OnInit, OnDestroy {
-  isAdmin: boolean = true;
+  isAdmin: boolean = false;
   newBucketItem: string = '';
   newEmoji: string = '';
   newLatitude: number = 0;
@@ -27,11 +27,11 @@ export class DestinationComponent implements OnInit, OnDestroy {
   newUniqueThing: string = '';
 
   bucketList: BucketListItem[] = [];
-  chunkedList: BucketListItem[][] = [];
   isLoading: boolean = false;
   private userSub!: Subscription;
   private map: any;
   userId: any;
+  username: string = '';
 
   constructor(
     private blogService: BlogService,
@@ -43,12 +43,13 @@ export class DestinationComponent implements OnInit, OnDestroy {
   ngOnInit() {
     const user = JSON.parse(sessionStorage.getItem('user') || '{}');
     this.userId = user?.id;
+    this.username = user?.username || '';
     const currentUrl = this.router.url;
     this.isAdmin = user?.role === 'admin' && currentUrl.startsWith('/admin');
 
     this.route.queryParams.subscribe((params) => {
       const focusId = params['focus'];
-      this.loadBucketList(focusId ? +focusId : undefined);
+      this.loadBucketList(focusId ? +params['focus'] : undefined);
     });
   }
 
@@ -73,17 +74,25 @@ export class DestinationComponent implements OnInit, OnDestroy {
           funFact: item.funfact ?? item.funFact ?? item.FunFact ?? '',
           uniqueThing:
             item.uniquething ?? item.uniqueThing ?? item.UniqueThing ?? '',
-
-          isWishlist: this.userId
-            ? !!(item.isWishlist ?? item.IsWishlist)
-            : false,
+          isWishlist: false, // default, will fetch below
         }));
 
-        this.chunkedList = this.chunkArray(this.bucketList, 10);
-        this.isLoading = false;
-        this.initMap(focusId);
+        if (this.userId) {
+          this.blogService
+            .getUserWishlist(this.username)
+            .subscribe((wishlist) => {
+              const wishlistIds = new Set(wishlist.map((i) => i.id));
+              this.bucketList.forEach((item) => {
+                item.isWishlist = wishlistIds.has(item.id);
+              });
+              this.initMap(focusId);
+              this.isLoading = false;
+            });
+        } else {
+          this.initMap(focusId);
+          this.isLoading = false;
+        }
       },
-
       (error) => {
         console.error('Failed to load bucket list', error);
         this.isLoading = false;
@@ -109,21 +118,25 @@ export class DestinationComponent implements OnInit, OnDestroy {
     this.isLoading = true;
     this.blogService.addBucketListItem(item).subscribe({
       next: () => {
-        this.newBucketItem = '';
-        this.newEmoji = '';
-        this.newLatitude = 0;
-        this.newLongitude = 0;
-        this.newCountry = '';
-        this.newFunFact = '';
-        this.newUniqueThing = '';
+        this.resetNewItemForm();
         this.loadBucketList();
-        this.isLoading = false;
       },
       error: (err) => {
         console.error('Failed to add bucket list item', err);
         this.isLoading = false;
       },
     });
+  }
+
+  resetNewItemForm() {
+    this.newBucketItem = '';
+    this.newEmoji = '';
+    this.newLatitude = 0;
+    this.newLongitude = 0;
+    this.newCountry = '';
+    this.newFunFact = '';
+    this.newUniqueThing = '';
+    this.isLoading = false;
   }
 
   autoFillCoordinates() {
@@ -171,18 +184,6 @@ export class DestinationComponent implements OnInit, OnDestroy {
     });
   }
 
-  chunkArray(arr: BucketListItem[], size: number): BucketListItem[][] {
-    const result: BucketListItem[][] = [];
-    for (let i = 0; i < arr.length; i += size) {
-      result.push(arr.slice(i, i + size));
-    }
-    return result;
-  }
-
-  trackByItemId(index: number, item: BucketListItem): number {
-    return item.id ?? -1;
-  }
-
   generatePopupContent(item: BucketListItem, isAdmin: boolean): string {
     const isLoggedIn = !!this.userId;
     const isUser = isLoggedIn && !isAdmin;
@@ -216,32 +217,6 @@ export class DestinationComponent implements OnInit, OnDestroy {
     </div>`;
   }
 
-  bindWishlistStar(marker: any, item: BucketListItem) {
-    setTimeout(() => {
-      const star = document.querySelector(
-        `.wishlist-star[data-id="${item.id}"]`
-      ) as HTMLElement;
-
-      if (!star) return;
-
-      star.addEventListener('click', () => {
-        const newStatus = !item.isWishlist;
-
-        this.blogService
-          .updateWishlist(this.userId, item.id!, newStatus)
-          .subscribe({
-            next: () => {
-              item.isWishlist = newStatus;
-              marker.setPopupContent(
-                this.generatePopupContent(item, this.isAdmin)
-              );
-              this.bindWishlistStar(marker, item);
-            },
-          });
-      });
-    }, 0);
-  }
-
   initMap(focusId?: number) {
     if (this.map) this.map.remove();
 
@@ -273,26 +248,27 @@ export class DestinationComponent implements OnInit, OnDestroy {
       marker.bindPopup(this.generatePopupContent(item, this.isAdmin));
 
       marker.on('popupopen', () => {
-        if (!this.isAdmin) {
+        if (!this.isAdmin && this.userId && item.id !== undefined) {
           const star = document.querySelector(
             `.wishlist-star[data-id="${item.id}"]`
           ) as HTMLElement;
-
           if (!star) return;
 
           star.onclick = () => {
-            const newStatus = !item.isWishlist;
+            const oldStatus = item.isWishlist;
+            item.isWishlist = !oldStatus;
+            marker.setPopupContent(
+              this.generatePopupContent(item, this.isAdmin)
+            );
+
             this.blogService
-              .updateWishlist(this.userId, item.id!, newStatus)
+              .updateWishlist(this.userId, item.id!, item.isWishlist)
               .subscribe({
-                next: () => {
-                  item.isWishlist = newStatus;
-                  // Re-render popup content
+                error: () => {
+                  item.isWishlist = oldStatus;
                   marker.setPopupContent(
                     this.generatePopupContent(item, this.isAdmin)
                   );
-                  // Re-bind click
-                  marker.fire('popupopen');
                 },
               });
           };

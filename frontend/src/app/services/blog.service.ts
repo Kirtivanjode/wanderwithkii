@@ -11,8 +11,8 @@ import {
 
 @Injectable({ providedIn: 'root' })
 export class BlogService {
-  private baseUrl = 'https://backend-btmn.onrender.com/api';
-
+  // private baseUrl = 'https://backend-btmn.onrender.com/api';
+  private baseUrl = 'https://http://localhost:3000//api';
   constructor(private http: HttpClient) {}
 
   login(data: { username: string; password: string }) {
@@ -129,14 +129,6 @@ export class BlogService {
     return this.http.get<BucketListItem[]>(`${this.baseUrl}/bucketlist`);
   }
 
-  updateWishlist(userId: number, bucketItemId: number, isWishlist: boolean) {
-    return this.http.post(`${this.baseUrl}/bucketlist/wishlist`, {
-      userId,
-      bucketItemId,
-      isWishlist,
-    });
-  }
-
   addBucketListItem(item: {
     Name: string;
     Country: string;
@@ -232,6 +224,14 @@ export class BlogService {
           }))
         )
       );
+  }
+
+  updateWishlist(userId: number, bucketItemId: number, isWishlist: boolean) {
+    return this.http.post(`${this.baseUrl}/wishlist`, {
+      userId,
+      bucketItemId,
+      isWishlist,
+    });
   }
 
   deleteSection(id: number): Observable<any> {
