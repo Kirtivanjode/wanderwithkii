@@ -762,7 +762,8 @@ app.get("/api/wishlist/:username", async (req, res) => {
   }
 });
 
-app.get("/api/wishlist", async (req, res) => {
+// Example in Express
+app.post("/api/wishlist", async (req, res) => {
   try {
     const { userId, bucketItemId, isWishlist } = req.body;
 
@@ -771,25 +772,21 @@ app.get("/api/wishlist", async (req, res) => {
     }
 
     if (isWishlist) {
-      // Insert into wishlist
-      const result = await pool.query(
-        "INSERT INTO userwishlist (userid, bucketitemid) VALUES ($1, $2) ON CONFLICT DO NOTHING RETURNING *",
-        [userId, bucketItemId]
-      );
-      return res.json(result.rows[0] || { success: true });
-    } else {
-      // Remove from wishlist
       await pool.query(
-        "DELETE FROM userwishlist WHERE userid = $1 AND bucketitemid = $2",
+        "INSERT INTO wishlist (userid, bucketitemid) VALUES ($1, $2) ON CONFLICT DO NOTHING",
         [userId, bucketItemId]
       );
-      return res.json({ success: true });
+    } else {
+      await pool.query(
+        "DELETE FROM wishlist WHERE userid = $1 AND bucketitemid = $2",
+        [userId, bucketItemId]
+      );
     }
+
+    res.json({ success: true });
   } catch (err) {
-    console.error("Wishlist error:", err.message);
-    res
-      .status(500)
-      .json({ error: "Internal Server Error", details: err.message });
+    console.error("Error in POST /api/wishlist:", err);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 });
 

@@ -227,14 +227,9 @@ export class BlogService {
   }
 
   updateWishlist(userId: number, bucketItemId: number, isWishlist: boolean) {
-    console.log('Sending Wishlist Update:', {
-      userId,
-      bucketItemId,
-      isWishlist,
-    });
     return this.http.post(`${this.baseUrl}/wishlist`, {
       userId,
-      bucketItemId,
+      itemId: bucketItemId, // ✅ rename here
       isWishlist,
     });
   }
