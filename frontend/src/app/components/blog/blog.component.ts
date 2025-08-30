@@ -130,14 +130,15 @@ export class BlogComponent implements OnInit, AfterViewInit {
 
         this.blogPosts = posts.map((p) => ({
           ...p,
-          date: this.datePipe.transform(p.post_date, 'medium'), // creates `date` for template
-          isLiked: p.isliked, // use backend boolean
+          date: this.datePipe.transform(p.post_date, 'medium'),
+          isLiked: p.isliked,
           likes: p.likes || 0,
-          commentList: [], // initialize empty array
-          comments: p.commentcount || 0, // map backend field
+          commentList: [],
+          comments: p.commentcount || 0,
           showFullSummary: false,
           showComments: false,
-          imageIds: p.imageid ? [p.imageid] : [], // map single image
+          imageIds: p.imageid ? [p.imageid] : [],
+          isHighlighted: this.highlightPostId === p.id, // ✅ mark highlighted post
         }));
       },
       error: (err) => console.error('Error loading posts', err),

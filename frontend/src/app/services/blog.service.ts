@@ -229,7 +229,7 @@ export class BlogService {
   updateWishlist(userId: number, bucketItemId: number, isWishlist: boolean) {
     return this.http.post(`${this.baseUrl}/wishlist`, {
       userId,
-      itemId: bucketItemId, // ✅ rename here
+      bucketItemId, // ✅ correct key
       isWishlist,
     });
   }
