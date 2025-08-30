@@ -764,36 +764,32 @@ app.get("/api/wishlist/:username", async (req, res) => {
 
 app.post("/api/wishlist", async (req, res) => {
   try {
-    console.log("Incoming wishlist request:", req.body);
-    const { userId, bucketItemId } = req.body; // ✅ match frontend
+    const { userId, bucketItemId, isWishlist } = req.body;
 
     if (!userId || !bucketItemId) {
-      console.error("Missing userId or bucketItemId", req.body);
       return res.status(400).json({ error: "Missing userId or bucketItemId" });
     }
 
-    // Check if already in wishlist
-    const existing = await pool.query(
-      "SELECT * FROM userwishlist WHERE userid=$1 AND bucketitemid=$2",
-      [userId, bucketItemId]
-    );
-
-    if (existing.rows.length > 0) {
-      await pool.query(
-        "DELETE FROM userwishlist WHERE userid=$1 AND bucketitemid=$2",
+    if (isWishlist) {
+      // Insert into wishlist
+      const result = await pool.query(
+        "INSERT INTO wishlist (userid, bucketitemid) VALUES ($1, $2) ON CONFLICT DO NOTHING RETURNING *",
         [userId, bucketItemId]
       );
-      res.json({ message: "Removed from wishlist" });
+      return res.json(result.rows[0] || { success: true });
     } else {
+      // Remove from wishlist
       await pool.query(
-        "INSERT INTO userwishlist(userid, bucketitemid) VALUES($1, $2)",
+        "DELETE FROM wishlist WHERE userid = $1 AND bucketitemid = $2",
         [userId, bucketItemId]
       );
-      res.json({ message: "Added to wishlist" });
+      return res.json({ success: true });
     }
   } catch (err) {
-    console.error("Wishlist error:", err);
-    res.status(500).json({ error: "Internal server error" });
+    console.error("Wishlist error:", err.message);
+    res
+      .status(500)
+      .json({ error: "Internal Server Error", details: err.message });
   }
 });
 
