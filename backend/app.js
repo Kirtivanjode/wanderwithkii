@@ -773,14 +773,14 @@ app.post("/api/wishlist", async (req, res) => {
     if (isWishlist) {
       // Insert into wishlist
       const result = await pool.query(
-        "INSERT INTO wishlist (userid, bucketitemid) VALUES ($1, $2) ON CONFLICT DO NOTHING RETURNING *",
+        "INSERT INTO userwishlist (userid, bucketitemid) VALUES ($1, $2) ON CONFLICT DO NOTHING RETURNING *",
         [userId, bucketItemId]
       );
       return res.json(result.rows[0] || { success: true });
     } else {
       // Remove from wishlist
       await pool.query(
-        "DELETE FROM wishlist WHERE userid = $1 AND bucketitemid = $2",
+        "DELETE FROM userwishlist WHERE userid = $1 AND bucketitemid = $2",
         [userId, bucketItemId]
       );
       return res.json({ success: true });
