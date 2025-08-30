@@ -744,6 +744,7 @@ app.delete("/api/home/:id", async (req, res) => {
   }
 });
 
+// ✅ Get wishlist for a user by username
 app.get("/api/wishlist/:username", async (req, res) => {
   try {
     const result = await pool.query(
@@ -754,18 +755,18 @@ app.get("/api/wishlist/:username", async (req, res) => {
        WHERE u.username = $1`,
       [req.params.username]
     );
+
     res.json(result.rows);
   } catch (err) {
-    console.error("Error fetching wishlist:", err);
+    console.error("❌ Error fetching wishlist:", err.message);
     res.status(500).send("Server error fetching wishlist");
   }
 });
 
+// ✅ Add or remove from wishlist
 app.post("/api/wishlist", async (req, res) => {
   try {
     const { userId, bucketItemId, isWishlist } = req.body;
-
-    console.log("Incoming wishlist payload:", req.body);
 
     if (!userId || !bucketItemId) {
       return res
@@ -774,6 +775,7 @@ app.post("/api/wishlist", async (req, res) => {
     }
 
     if (isWishlist) {
+      // ✅ Ensure unique constraint exists: (userid, bucketitemid)
       await pool.query(
         `INSERT INTO userwishlist (userid, bucketitemid)
          VALUES ($1, $2)
@@ -783,14 +785,16 @@ app.post("/api/wishlist", async (req, res) => {
       res.json({ message: "Added to wishlist" });
     } else {
       await pool.query(
-        `DELETE FROM userwishlist WHERE userid = $1 AND bucketitemid = $2`,
+        "DELETE FROM userwishlist WHERE userid = $1 AND bucketitemid = $2",
         [userId, bucketItemId]
       );
       res.json({ message: "Removed from wishlist" });
     }
   } catch (err) {
-    console.error("Error updating wishlist:", err.message);
-    res.status(500).json({ error: "Failed to update wishlist" });
+    console.error("❌ Error updating wishlist:", err.message);
+    res
+      .status(500)
+      .json({ error: "Failed to update wishlist", details: err.message });
   }
 });
 
