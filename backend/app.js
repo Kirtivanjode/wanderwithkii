@@ -765,29 +765,29 @@ app.get("/api/wishlist/:username", async (req, res) => {
 app.post("/api/wishlist", async (req, res) => {
   try {
     console.log("Incoming wishlist request:", req.body);
-    const { userId, itemId } = req.body;
+    const { userId, bucketItemId } = req.body; // ✅ match frontend
 
-    if (!userId || !itemId) {
-      console.error("Missing userId or itemId", req.body);
-      return res.status(400).json({ error: "Missing userId or itemId" });
+    if (!userId || !bucketItemId) {
+      console.error("Missing userId or bucketItemId", req.body);
+      return res.status(400).json({ error: "Missing userId or bucketItemId" });
     }
 
     // Check if already in wishlist
     const existing = await pool.query(
       "SELECT * FROM userwishlist WHERE userid=$1 AND bucketitemid=$2",
-      [userId, itemId]
+      [userId, bucketItemId]
     );
 
     if (existing.rows.length > 0) {
       await pool.query(
         "DELETE FROM userwishlist WHERE userid=$1 AND bucketitemid=$2",
-        [userId, itemId]
+        [userId, bucketItemId]
       );
       res.json({ message: "Removed from wishlist" });
     } else {
       await pool.query(
         "INSERT INTO userwishlist(userid, bucketitemid) VALUES($1, $2)",
-        [userId, itemId]
+        [userId, bucketItemId]
       );
       res.json({ message: "Added to wishlist" });
     }
