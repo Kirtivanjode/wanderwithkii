@@ -762,7 +762,7 @@ app.get("/api/wishlist/:username", async (req, res) => {
   }
 });
 
-app.post("/api/wishlist", async (req, res) => {
+app.get("/api/wishlist", async (req, res) => {
   try {
     const { userId, bucketItemId, isWishlist } = req.body;
 
