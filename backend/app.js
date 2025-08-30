@@ -755,24 +755,25 @@ app.get("/api/wishlist/:username", async (req, res) => {
        WHERE u.username = $1`,
       [req.params.username]
     );
-
     res.json(result.rows);
   } catch (err) {
-    console.error("❌ Error fetching wishlist:", err.message);
+    console.error("Error fetching wishlist:", err.message);
     res.status(500).send("Server error fetching wishlist");
   }
 });
 
-app.get("/api/wishlist/userId", async (req, res) => {
+// ✅ Add or remove from wishlist
+app.post("/api/wishlist", async (req, res) => {
   try {
+    console.log("Incoming wishlist payload:", req.body);
     const { userId, bucketItemId, isWishlist } = req.body;
-    console.log("Incoming data:", req.body);
 
     if (!userId || !bucketItemId) {
       return res.status(400).json({ error: "Missing userId or bucketItemId" });
     }
 
     if (isWishlist) {
+      // Insert with conflict prevention
       const result = await pool.query(
         `INSERT INTO userwishlist (userid, bucketitemid)
          VALUES ($1, $2)
@@ -780,14 +781,14 @@ app.get("/api/wishlist/userId", async (req, res) => {
          RETURNING *`,
         [userId, bucketItemId]
       );
-      console.log("Inserted row:", result.rows[0]);
-      res.json({ message: "Added to wishlist", item: result.rows[0] });
+      return res.json({ message: "Added to wishlist", item: result.rows[0] });
     } else {
+      // Remove
       await pool.query(
-        "DELETE FROM userwishlist WHERE userid = $1 AND bucketitemid = $2",
+        `DELETE FROM userwishlist WHERE userid = $1 AND bucketitemid = $2`,
         [userId, bucketItemId]
       );
-      res.json({ message: "Removed from wishlist" });
+      return res.json({ message: "Removed from wishlist" });
     }
   } catch (err) {
     console.error("Error updating wishlist:", err.message, err.stack);
