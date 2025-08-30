@@ -760,6 +760,7 @@ app.get("/api/wishlist/:username", async (req, res) => {
     res.status(500).send("Server error fetching wishlist");
   }
 });
+
 app.post("/api/wishlist", async (req, res) => {
   try {
     const { userId, bucketItemId, isWishlist } = req.body;
