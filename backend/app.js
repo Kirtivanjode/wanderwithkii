@@ -767,7 +767,7 @@ app.post("/api/wishlist", async (req, res) => {
 
     if (isWishlist) {
       await pool.query(
-        "INSERT INTO userwishlist (userid, bucketitemid) VALUES ($1, $2) ON CONFLICT DO NOTHING",
+        "INSERT INTO userwishlist (userid, bucketitemid) VALUES ($1, $2) ON CONFLICT (userid, bucketitemid) DO NOTHING",
         [userId, bucketItemId]
       );
       res.json({ message: "Added to wishlist" });
