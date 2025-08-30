@@ -763,26 +763,25 @@ app.get("/api/wishlist/:username", async (req, res) => {
   }
 });
 
-// ✅ Add or remove from wishlist
 app.post("/api/wishlist", async (req, res) => {
   try {
     const { userId, bucketItemId, isWishlist } = req.body;
+    console.log("Incoming data:", req.body);
 
     if (!userId || !bucketItemId) {
-      return res
-        .status(400)
-        .json({ error: "userId and bucketItemId are required" });
+      return res.status(400).json({ error: "Missing userId or bucketItemId" });
     }
 
     if (isWishlist) {
-      // ✅ Ensure unique constraint exists: (userid, bucketitemid)
-      await pool.query(
+      const result = await pool.query(
         `INSERT INTO userwishlist (userid, bucketitemid)
          VALUES ($1, $2)
-         ON CONFLICT (userid, bucketitemid) DO NOTHING`,
+         ON CONFLICT (userid, bucketitemid) DO NOTHING
+         RETURNING *`,
         [userId, bucketItemId]
       );
-      res.json({ message: "Added to wishlist" });
+      console.log("Inserted row:", result.rows[0]);
+      res.json({ message: "Added to wishlist", item: result.rows[0] });
     } else {
       await pool.query(
         "DELETE FROM userwishlist WHERE userid = $1 AND bucketitemid = $2",
@@ -791,7 +790,7 @@ app.post("/api/wishlist", async (req, res) => {
       res.json({ message: "Removed from wishlist" });
     }
   } catch (err) {
-    console.error("❌ Error updating wishlist:", err.message);
+    console.error("Error updating wishlist:", err.message, err.stack);
     res
       .status(500)
       .json({ error: "Failed to update wishlist", details: err.message });
