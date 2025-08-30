@@ -765,13 +765,13 @@ app.post("/api/wishlist", async (req, res) => {
   try {
     const { userId, bucketId } = req.body;
     const result = await pool.query(
-      "INSERT INTO wishlist (userid, bucketid) VALUES ($1, $2) RETURNING *",
+      "INSERT INTO Wishlist (userid, bucketid) VALUES ($1, $2) RETURNING *",
       [userId, bucketId]
     );
     res.json(result.rows[0]);
   } catch (err) {
-    console.error(err.message);
-    res.status(500).send("Server error");
+    console.error("Error adding to wishlist:", err);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
