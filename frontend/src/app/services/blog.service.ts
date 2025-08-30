@@ -227,7 +227,7 @@ export class BlogService {
   }
 
   updateWishlist(userId: number, bucketItemId: number, isWishlist: boolean) {
-    return this.http.post(`${this.baseUrl}/wishlist/${encodeURIComponent(userId)}`, {
+    return this.http.post(`${this.baseUrl}/wishlist`, {
       userId,
       bucketItemId,
       isWishlist,
