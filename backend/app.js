@@ -765,21 +765,31 @@ app.post("/api/wishlist", async (req, res) => {
   try {
     const { userId, bucketItemId, isWishlist } = req.body;
 
+    console.log("Incoming wishlist payload:", req.body);
+
+    if (!userId || !bucketItemId) {
+      return res
+        .status(400)
+        .json({ error: "userId and bucketItemId are required" });
+    }
+
     if (isWishlist) {
       await pool.query(
-        "INSERT INTO userwishlist (userid, bucketitemid) VALUES ($1, $2) ON CONFLICT (userid, bucketitemid) DO NOTHING",
+        `INSERT INTO userwishlist (userid, bucketitemid)
+         VALUES ($1, $2)
+         ON CONFLICT (userid, bucketitemid) DO NOTHING`,
         [userId, bucketItemId]
       );
       res.json({ message: "Added to wishlist" });
     } else {
       await pool.query(
-        "DELETE FROM userwishlist WHERE userid = $1 AND bucketitemid = $2",
+        `DELETE FROM userwishlist WHERE userid = $1 AND bucketitemid = $2`,
         [userId, bucketItemId]
       );
       res.json({ message: "Removed from wishlist" });
     }
   } catch (err) {
-    console.error("Error updating wishlist:", err);
+    console.error("Error updating wishlist:", err.message);
     res.status(500).json({ error: "Failed to update wishlist" });
   }
 });
