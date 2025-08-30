@@ -744,7 +744,6 @@ app.delete("/api/home/:id", async (req, res) => {
   }
 });
 
-// ✅ Get wishlist for a user by username
 app.get("/api/wishlist/:username", async (req, res) => {
   try {
     const result = await pool.query(
@@ -761,8 +760,6 @@ app.get("/api/wishlist/:username", async (req, res) => {
     res.status(500).send("Server error fetching wishlist");
   }
 });
-
-// Example in Express
 app.post("/api/wishlist", async (req, res) => {
   try {
     const { userId, bucketItemId, isWishlist } = req.body;
@@ -773,19 +770,19 @@ app.post("/api/wishlist", async (req, res) => {
 
     if (isWishlist) {
       await pool.query(
-        "INSERT INTO wishlist (userid, bucketitemid) VALUES ($1, $2) ON CONFLICT DO NOTHING",
+        "INSERT INTO userwishlist (userid, bucketitemid) VALUES ($1, $2) ON CONFLICT DO NOTHING",
         [userId, bucketItemId]
       );
     } else {
       await pool.query(
-        "DELETE FROM wishlist WHERE userid = $1 AND bucketitemid = $2",
+        "DELETE FROM userwishlist WHERE userid = $1 AND bucketitemid = $2",
         [userId, bucketItemId]
       );
     }
 
     res.json({ success: true });
   } catch (err) {
-    console.error("Error in POST /api/wishlist:", err);
+    console.error("Error in POST /api/wishlist:", err.message);
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
