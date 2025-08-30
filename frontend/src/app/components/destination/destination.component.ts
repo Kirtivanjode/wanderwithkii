@@ -58,6 +58,7 @@ export class DestinationComponent implements OnInit, OnDestroy {
       this.userSub.unsubscribe();
     }
   }
+  chunkedList: BucketListItem[][] = [];
 
   loadBucketList(focusId?: number) {
     this.isLoading = true;
@@ -74,8 +75,11 @@ export class DestinationComponent implements OnInit, OnDestroy {
           funFact: item.funfact ?? item.funFact ?? item.FunFact ?? '',
           uniqueThing:
             item.uniquething ?? item.uniqueThing ?? item.UniqueThing ?? '',
-          isWishlist: false, // default, will fetch below
+          isWishlist: false,
         }));
+
+        // Split into 3 columns
+        this.chunkedList = this.chunkArray(this.bucketList, 3);
 
         if (this.userId) {
           this.blogService
@@ -98,6 +102,19 @@ export class DestinationComponent implements OnInit, OnDestroy {
         this.isLoading = false;
       }
     );
+  }
+
+  // Helper to split into columns
+  private chunkArray<T>(arr: T[], columns: number): T[][] {
+    const chunked: T[][] = Array.from({ length: columns }, () => []);
+    arr.forEach((item, index) => {
+      chunked[index % columns].push(item);
+    });
+    return chunked;
+  }
+
+  trackByItemId(index: number, item: BucketListItem) {
+    return item.id;
   }
 
   addBucketItem() {

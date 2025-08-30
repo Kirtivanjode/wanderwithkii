@@ -761,6 +761,43 @@ app.get("/api/wishlist/:username", async (req, res) => {
   }
 });
 
+app.post("/api/wishlist", async (req, res) => {
+  try {
+    const { userId, bucketId } = req.body;
+    const result = await pool.query(
+      "INSERT INTO wishlist (userid, bucketid) VALUES ($1, $2) RETURNING *",
+      [userId, bucketId]
+    );
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server error");
+  }
+});
+
+app.post("/api/wishlist", async (req, res) => {
+  try {
+    const { userId, bucketItemId, isWishlist } = req.body;
+
+    if (isWishlist) {
+      await pool.query(
+        "INSERT INTO wishlist (userid, bucketitemid) VALUES ($1, $2) ON CONFLICT DO NOTHING",
+        [userId, bucketItemId]
+      );
+      res.json({ message: "Added to wishlist" });
+    } else {
+      await pool.query(
+        "DELETE FROM wishlist WHERE userid = $1 AND bucketitemid = $2",
+        [userId, bucketItemId]
+      );
+      res.json({ message: "Removed from wishlist" });
+    }
+  } catch (err) {
+    console.error("Error updating wishlist:", err);
+    res.status(500).json({ error: "Failed to update wishlist" });
+  }
+});
+
 app.get("/api/liked-posts/:username", async (req, res) => {
   try {
     const result = await pool.query(
