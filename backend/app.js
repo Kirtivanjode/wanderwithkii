@@ -762,29 +762,24 @@ app.get("/api/wishlist/:username", async (req, res) => {
 });
 
 app.post("/api/wishlist", async (req, res) => {
+  const { userId, bucketItemId, isWishlist } = req.body;
   try {
-    const { userId, bucketItemId, isWishlist } = req.body;
-
-    if (!userId || !bucketItemId) {
-      return res.status(400).json({ error: "Missing userId or bucketItemId" });
-    }
-
     if (isWishlist) {
       await pool.query(
-        "INSERT INTO userwishlist (userid, bucketitemid) VALUES ($1, $2) ON CONFLICT DO NOTHING",
+        `INSERT INTO UserWishlist (UserId, BucketItemId)
+         VALUES ($1, $2)
+         ON CONFLICT DO NOTHING`,
         [userId, bucketItemId]
       );
     } else {
       await pool.query(
-        "DELETE FROM userwishlist WHERE userid = $1 AND bucketitemid = $2",
+        `DELETE FROM UserWishlist WHERE UserId = $1 AND BucketItemId = $2`,
         [userId, bucketItemId]
       );
     }
-
-    res.json({ success: true });
+    res.json({ message: "Wishlist updated" });
   } catch (err) {
-    console.error("Error in POST /api/wishlist:", err.message);
-    res.status(500).json({ error: "Internal Server Error" });
+    res.status(500).json({ message: "Failed to update wishlist" });
   }
 });
 
