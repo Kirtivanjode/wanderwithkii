@@ -32,13 +32,12 @@
       <button *ngIf="!isLoggedIn" (click)="openLogin()" class="subscribe">
         Subscribe
       </button>
-      <div class="dflex">
-        <div *ngIf="isLoggedIn" class="user-menu">
-          <i class="material-icons">{{
-            isAdmin ? "manage_accounts" : "account_circle"
-          }}</i>
-          {{ username }}
-        </div>
+
+      <div *ngIf="isLoggedIn" class="user-menu">
+        <i class="material-icons">{{
+          isAdmin ? "manage_accounts" : "account_circle"
+        }}</i>
+        {{ username }}
       </div>
 
       <div

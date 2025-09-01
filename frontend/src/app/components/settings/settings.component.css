@@ -10,7 +10,7 @@
 
 .sidebar-toggle {
   position: absolute;
-  top: 20px;
+  top: 10px;
   left: 250px;
   background-color: #889171;
   color: #fff;
@@ -27,11 +27,11 @@
 }
 
 .settings-container:not(.collapsed) .sidebar-toggle {
-  left: 270px;
+  left: 230px;
 }
 
 .settings-container.collapsed .sidebar-toggle {
-  left: 60px;
+  left: 40px;
 }
 
 .settings-sidebar {
@@ -47,7 +47,7 @@
 
 .settings-container.collapsed .settings-sidebar {
   width: 60px;
-  padding: 20px 10px;
+  padding: 30px 10px;
 }
 
 .settings-container.collapsed .settings-sidebar h2 {
@@ -118,6 +118,7 @@ input {
   width: 100%;
   margin-bottom: 1rem;
   font-size: 1rem;
+  display: flex;
 }
 
 .password-input-wrapper {

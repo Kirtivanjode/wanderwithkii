@@ -67,8 +67,8 @@ body {
 }
 
 .auth-wrapper {
-  position: relative;
-  display: inline-block;
+  display: flex;
+  align-items: center;
 }
 
 .user-menu {
@@ -84,6 +84,10 @@ body {
   align-items: center;
   min-width: 123px;
   justify-content: center;
+}
+
+.dropdown {
+  font-size: 30px;
 }
 
 .dropdown button {
@@ -208,8 +212,6 @@ textarea {
     margin-top: 10px;
     width: 100%;
     text-align: center;
-    display: flex;
-    justify-content: space-between;
   }
 
   .user-menu,
