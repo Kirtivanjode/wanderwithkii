@@ -2,8 +2,11 @@
   display: flex;
   position: relative;
   transition: all 0.3s ease;
+  height: 100vh;
+  overflow: hidden;
 }
 
+/* Sidebar Toggle Button */
 .sidebar-toggle {
   position: absolute;
   top: 20px;
@@ -16,60 +19,53 @@
   height: 40px;
   font-size: 20px;
   cursor: pointer;
-  transition: all 0.3s ease;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: all 0.3s ease;
+  z-index: 10;
 }
 
+/* Toggle Position when Collapsed */
 .settings-container:not(.collapsed) .sidebar-toggle {
-  left: 270px;
+  left: 250px;
 }
-
 .settings-container.collapsed .sidebar-toggle {
   left: 60px;
 }
 
+/* Sidebar */
 .settings-sidebar {
   width: 250px;
   background-color: #cfd8b8;
   padding: 20px;
   transition: all 0.3s ease;
-  overflow: hidden;
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
-  height: 77vh;
+  height: 100%;
+  overflow: hidden;
 }
 
 .settings-container.collapsed .settings-sidebar {
   width: 60px;
   padding: 20px 10px;
 }
-
 .settings-container.collapsed .settings-sidebar h2 {
   display: none;
 }
 
+/* Main Content */
 .settings-content {
   flex: 1;
   padding: 20px;
   background-color: #fafafa;
   overflow-y: auto;
-  height: 77vh;
+  height: 100%;
+  transition: all 0.3s ease;
 }
 
-.material-icons {
-  transition: transform 0.3s ease;
-  display: inline-block;
-  font-size: 24px;
-  padding-left: 10px;
-}
-
-.material-icons.rotated {
-  transform: rotate(180deg);
-}
-
+/* Tabs */
 .tab {
   padding: 10px 15px;
   border-radius: 10px;
@@ -82,7 +78,21 @@
   transition: all 0.3s ease;
   margin-bottom: 10px;
 }
+.settings-container.collapsed .tab-label {
+  display: none;
+}
+.settings-container.collapsed .tab {
+  justify-content: center;
+}
+.tab.active {
+  background-color: #889171;
+  color: white;
+}
+.tab:hover {
+  background-color: #dbe8cb;
+}
 
+/* Logout Tab */
 .logout-tab {
   border-radius: 5px;
   padding: 10px;
@@ -91,35 +101,11 @@
   cursor: pointer;
   transition: background-color 0.3s;
 }
-
 .logout-tab .material-icons {
   font-size: 28px;
 }
 
-.tab:hover {
-  background-color: #dbe8cb;
-}
-
-.tab.active {
-  background-color: #889171;
-  color: white;
-}
-
-.tab-icon {
-  font-size: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.settings-container.collapsed .tab-label {
-  display: none;
-}
-
-.settings-container.collapsed .tab {
-  justify-content: center;
-}
-
+/* Inputs & Buttons */
 input {
   padding: 0.6rem 1rem;
   border-radius: 8px;
@@ -134,11 +120,10 @@ input {
   position: relative;
   width: 100%;
 }
-
 .password-input-wrapper i {
   position: absolute;
-  top: 37%;
-  right: 6px;
+  top: 50%;
+  right: 10px;
   transform: translateY(-50%);
   cursor: pointer;
   color: #666;
@@ -154,22 +139,21 @@ button {
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
-
 button:hover {
-  background-color: #d4ddbe;
+  background-color: #adb893;
 }
-
 button:disabled {
   background-color: #a0aec0;
   cursor: not-allowed;
 }
 
+/* Theme Options */
 .theme-options {
   display: flex;
   gap: 1rem;
   margin-top: 10px;
+  flex-wrap: wrap;
 }
-
 .theme-options div {
   padding: 0.5rem 1rem;
   background-color: #e1e9cd;
@@ -178,11 +162,11 @@ button:disabled {
   font-weight: 500;
   transition: background 0.3s ease;
 }
-
 .theme-options div:hover {
   background-color: #d4ddbe;
 }
 
+/* Wishlist & Comments */
 .wishlist-item,
 .comment-card {
   background-color: #fff;
@@ -191,13 +175,13 @@ button:disabled {
   margin-bottom: 1rem;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
 }
-
 .comment-content {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 1rem;
 }
 
+/* Read More */
 .read-more {
   display: inline-block;
   margin-top: 0.4rem;
@@ -205,34 +189,22 @@ button:disabled {
   text-decoration: none;
   font-weight: 500;
 }
-
 .read-more:hover {
   text-decoration: underline;
 }
 
-@media (max-width: 768px) {
-  .sidebar-toggle {
-    display: block;
-  }
-
-  .settings-container {
-    flex-direction: column;
-  }
-
-  .settings-sidebar {
-    width: 100%;
-    border-bottom: 1px solid #ccc;
-  }
-
-  .settings-container.collapsed .settings-sidebar {
-    display: none;
-  }
-
-  .settings-content {
-    padding: 20px;
-  }
+/* Icons */
+.material-icons {
+  transition: transform 0.3s ease;
+  display: inline-block;
+  font-size: 24px;
+  padding-left: 10px;
+}
+.material-icons.rotated {
+  transform: rotate(180deg);
 }
 
+/* Fade In Animation */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -241,5 +213,66 @@ button:disabled {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+/* Responsive Breakpoints */
+
+/* Medium Screens */
+@media (max-width: 1024px) {
+  .settings-sidebar {
+    width: 200px;
+  }
+  .settings-container:not(.collapsed) .sidebar-toggle {
+    left: 200px;
+  }
+}
+
+/* Tablet & Small Screens */
+@media (max-width: 768px) {
+  .settings-container {
+    flex-direction: column;
+    height: auto;
+  }
+  .settings-sidebar {
+    width: 100%;
+    height: auto;
+    border-bottom: 1px solid #ccc;
+    padding: 15px;
+  }
+  .settings-container.collapsed .settings-sidebar {
+    display: none;
+  }
+  .sidebar-toggle {
+    left: auto;
+    right: 20px;
+    top: 10px;
+  }
+  .settings-content {
+    width: 100%;
+    padding: 15px;
+    height: auto;
+  }
+  .tab {
+    padding: 8px 12px;
+  }
+  input,
+  button {
+    font-size: 0.95rem;
+  }
+}
+
+/* Mobile Phones */
+@media (max-width: 480px) {
+  .tab {
+    font-size: 0.85rem;
+    padding: 6px 10px;
+  }
+  .material-icons {
+    font-size: 20px;
+    padding-left: 5px;
+  }
+  button {
+    padding: 0.5rem 1rem;
   }
 }
