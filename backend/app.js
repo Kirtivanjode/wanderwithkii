@@ -152,7 +152,7 @@ app.get("/api/posts/:id", async (req, res) => {
 });
 
 app.post(
-  "/posts",
+  "/api/posts",
   upload.fields([{ name: "logoImage" }, { name: "postImage" }]),
   async (req, res) => {
     const { title, summary } = req.body;
@@ -169,7 +169,6 @@ app.post(
       let logoId = null;
       let postImageId = null;
 
-      // Insert logo image if provided
       if (logoImage) {
         const logoRes = await client.query(
           `INSERT INTO images (name, imagedata) VALUES ($1, $2) RETURNING id`,
@@ -178,7 +177,6 @@ app.post(
         logoId = logoRes.rows[0].id;
       }
 
-      // Insert post image if provided
       if (postImage) {
         const postRes = await client.query(
           `INSERT INTO images (name, imagedata) VALUES ($1, $2) RETURNING id`,
@@ -187,7 +185,6 @@ app.post(
         postImageId = postRes.rows[0].id;
       }
 
-      // Insert blog post
       const result = await client.query(
         `INSERT INTO blogposts (title, summary, author, post_date, likes, logoid, imageid)
          VALUES ($1, $2, $3, NOW(), 0, $4, $5)
