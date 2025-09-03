@@ -122,7 +122,6 @@ export class SettingsComponent implements OnInit {
   }
 
   loadUserData() {
-    // Wishlist
     this.blogService.getUserWishlist(this.user.username).subscribe({
       next: (res) =>
         (this.wishlist = res.map((item: any) => ({
@@ -134,13 +133,11 @@ export class SettingsComponent implements OnInit {
       error: (err) => console.error('Wishlist error', err),
     });
 
-    // Liked Posts
     this.blogService.getLikedPosts(this.user.username).subscribe({
       next: (res) => (this.likedPosts = res),
       error: (err) => console.error('Liked posts error', err),
     });
 
-    // Comments
     this.blogService.getUserComments(this.user.username).subscribe({
       next: (comments) => {
         const groupedMap = new Map<number, any>();

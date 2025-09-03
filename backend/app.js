@@ -152,19 +152,24 @@ app.get("/api/posts/:id", async (req, res) => {
 });
 
 app.post(
-  "/api/posts",
+  "/posts",
   upload.fields([{ name: "logoImage" }, { name: "postImage" }]),
   async (req, res) => {
     const { title, summary } = req.body;
     const postImage = req.files?.["postImage"]?.[0];
     const logoImage = req.files?.["logoImage"]?.[0];
 
+    console.log("Incoming body:", req.body);
+    console.log("Incoming files:", req.files);
+
     const client = await pool.connect();
     try {
       await client.query("BEGIN");
-      let logoId = null,
-        postImageId = null;
 
+      let logoId = null;
+      let postImageId = null;
+
+      // Insert logo image if provided
       if (logoImage) {
         const logoRes = await client.query(
           `INSERT INTO images (name, imagedata) VALUES ($1, $2) RETURNING id`,
@@ -172,6 +177,8 @@ app.post(
         );
         logoId = logoRes.rows[0].id;
       }
+
+      // Insert post image if provided
       if (postImage) {
         const postRes = await client.query(
           `INSERT INTO images (name, imagedata) VALUES ($1, $2) RETURNING id`,
@@ -180,21 +187,28 @@ app.post(
         postImageId = postRes.rows[0].id;
       }
 
+      // Insert blog post
       const result = await client.query(
         `INSERT INTO blogposts (title, summary, author, post_date, likes, logoid, imageid)
-       VALUES ($1, $2, $3, NOW(), 0, $4, $5) RETURNING id`,
+         VALUES ($1, $2, $3, NOW(), 0, $4, $5)
+         RETURNING id`,
         [title, summary, "Wander With KI", logoId, postImageId]
       );
 
       await client.query("COMMIT");
+
       res.status(201).json({
         message: "Post created successfully",
         postId: result.rows[0].id,
       });
     } catch (err) {
-      await client.query("ROLLBACK");
-      console.error("Error creating post:", err);
-      res.status(500).json({ error: "Failed to create post" });
+      try {
+        await client.query("ROLLBACK");
+      } catch (rollbackErr) {
+        console.error("Rollback failed:", rollbackErr);
+      }
+      console.error("Error creating post:", err.message);
+      res.status(500).json({ error: err.message });
     } finally {
       client.release();
     }
