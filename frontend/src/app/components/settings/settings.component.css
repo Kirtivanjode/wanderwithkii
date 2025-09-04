@@ -27,7 +27,7 @@
 }
 
 .settings-container:not(.collapsed) .sidebar-toggle {
-  left: 230px;
+  left: 229px;
 }
 
 .settings-container.collapsed .sidebar-toggle {
@@ -177,7 +177,7 @@ button:disabled {
 }
 
 .read-more {
-  color: #d4ddbe;
+  color: #587b03;
   text-decoration: none;
   font-weight: 500;
 }

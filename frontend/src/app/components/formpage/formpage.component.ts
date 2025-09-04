@@ -28,6 +28,11 @@ export class FormpageComponent implements OnInit {
     private toastr: ToastrService
   ) {}
 
+  sanitizePhone(event: Event) {
+    const input = event.target as HTMLInputElement;
+    this.signUpData.phone = input.value.replace(/[^0-9]/g, '');
+  }
+
   ngOnInit(): void {
     this.route.queryParams.subscribe((params) => {
       this.returnUrl = params['returnUrl'] || '/';

@@ -316,7 +316,7 @@ button:disabled {
   }
 
   .modal {
-    max-width: 90%;
+    max-width: 50%;
     height: auto;
   }
 }
@@ -337,7 +337,7 @@ button:disabled {
   }
 
   .modal {
-    max-width: 90%;
+    max-width: 50%;
     padding: 1rem 0.8rem;
   }
 
@@ -395,7 +395,7 @@ button:disabled {
   }
 
   .modal {
-    max-width: 95%;
+    max-width: 55%;
     padding: 0.8rem;
   }
 

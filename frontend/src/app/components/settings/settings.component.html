@@ -100,11 +100,40 @@
     <!-- Change Password -->
     <div class="tab-content" *ngIf="activeTab === 'password'">
       <label>Old Password:</label>
-      <input type="password" [(ngModel)]="oldPassword" />
+      <div class="password-input-wrapper">
+        <input
+          [type]="showOldPassword ? 'text' : 'password'"
+          [(ngModel)]="oldPassword"
+        />
+        <i class="material-icons" (click)="showOldPassword = !showOldPassword">
+          {{ showOldPassword ? "visibility" : "visibility_off" }}
+        </i>
+      </div>
+
       <label>New Password:</label>
-      <input type="password" [(ngModel)]="newPassword" />
+      <div class="password-input-wrapper">
+        <input
+          [type]="showNewPassword ? 'text' : 'password'"
+          [(ngModel)]="newPassword"
+        />
+        <i class="material-icons" (click)="showNewPassword = !showNewPassword">
+          {{ showNewPassword ? "visibility" : "visibility_off" }}
+        </i>
+      </div>
+
       <label>Confirm Password:</label>
-      <input type="password" [(ngModel)]="confirmPassword" />
+      <div class="password-input-wrapper">
+        <input
+          [type]="showConfirmPassword ? 'text' : 'password'"
+          [(ngModel)]="confirmPassword"
+        />
+        <i
+          class="material-icons"
+          (click)="showConfirmPassword = !showConfirmPassword"
+        >
+          {{ showConfirmPassword ? "visibility" : "visibility_off" }}
+        </i>
+      </div>
       <button (click)="changePassword()">Update Password</button>
     </div>
 

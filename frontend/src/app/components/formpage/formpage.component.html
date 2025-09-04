@@ -52,6 +52,17 @@
             name="password"
             required
           />
+          <input
+            type="tel"
+            placeholder="Phone number"
+            [(ngModel)]="signUpData.phone"
+            name="phone"
+            required
+            maxlength="10"
+            pattern="[0-9]*"
+            (input)="sanitizePhone($event)"
+          />
+
           <button type="submit">Sign Up</button>
         </form>
         <p>

@@ -68,7 +68,8 @@ body {
 
 .auth-wrapper {
   display: flex;
-  align-items: center;
+  align-items: baseline;
+  gap: 5px;
 }
 
 .user-menu {

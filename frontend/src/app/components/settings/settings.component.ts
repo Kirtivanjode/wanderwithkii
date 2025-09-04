@@ -15,6 +15,9 @@ import { AuthService } from '../../services/auth.service';
 })
 export class SettingsComponent implements OnInit {
   activeTab = 'personal';
+  showOldPassword = false;
+  showNewPassword = false;
+  showConfirmPassword = false;
 
   user = {
     id: 0,
