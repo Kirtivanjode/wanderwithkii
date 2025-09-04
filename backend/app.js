@@ -165,7 +165,6 @@ app.post(
       let logoId = null,
         postImageId = null;
 
-      // Insert logo image if uploaded
       if (logoImage) {
         const logoRes = await client.query(
           `INSERT INTO images (name, imagedata) VALUES ($1, $2) RETURNING id`,
@@ -174,7 +173,6 @@ app.post(
         logoId = logoRes.rows[0].id;
       }
 
-      // Insert post image if uploaded
       if (postImage) {
         const postRes = await client.query(
           `INSERT INTO images (name, imagedata) VALUES ($1, $2) RETURNING id`,
@@ -183,11 +181,9 @@ app.post(
         postImageId = postRes.rows[0].id;
       }
 
-      // Use default logo id if no logo uploaded
-      const DEFAULT_LOGO_ID = 1; // make sure this exists in your images table
+      const DEFAULT_LOGO_ID = 1;
       const finalLogoId = logoId || DEFAULT_LOGO_ID;
 
-      // Insert into blogposts
       const result = await client.query(
         `INSERT INTO blogposts (title, summary, author, post_date, likes, logoid, imageid)
          VALUES ($1, $2, $3, NOW(), 0, $4, $5) RETURNING id`,
@@ -305,7 +301,6 @@ app.post("/api/posts/:id/like", async (req, res) => {
       );
     }
 
-    // get updated likes
     const likesResult = await client.query(
       `SELECT username FROM postlikes WHERE post_id=$1`,
       [id]

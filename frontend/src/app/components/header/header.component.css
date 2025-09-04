@@ -213,6 +213,7 @@ textarea {
     margin-top: 10px;
     width: 100%;
     text-align: center;
+    gap: 5px;
   }
 
   .user-menu,
