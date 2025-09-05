@@ -27,8 +27,8 @@ interface BlogPost {
   date?: string; // formatted for template
   likes: number;
   logoid?: number;
-  commentList?: Comment[];
   comments?: number;
+  commentList: Comment[];
   isLiked?: boolean;
   showFullSummary?: boolean;
   showComments?: boolean;
