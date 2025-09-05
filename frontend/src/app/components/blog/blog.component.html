@@ -98,12 +98,17 @@
         No comments yet.
       </div>
 
-      <div *ngFor="let comment of post.commentList" class="comment">
-        <strong>{{ comment.username }}:</strong> {{ comment.message }}
+      <div
+        *ngFor="let comment of post.commentList"
+        class="comment d-flex justify-content-between align-items-center"
+      >
+        <div>
+          <strong>{{ comment.username }}:</strong> {{ comment.message }}
+        </div>
         <button
           *ngIf="isAdmin || comment.username === getCurrentUsername()"
           (click)="deleteComment(post.id, comment.id)"
-          class="btn btn-sm btn-link"
+          class="btn btn-sm btn-link text-danger"
         >
           🗑️
         </button>
