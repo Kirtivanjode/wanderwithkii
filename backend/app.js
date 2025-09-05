@@ -364,6 +364,7 @@ app.delete("/api/comments/:id", async (req, res) => {
   }
 });
 
+// GET all bucketlist items
 app.get("/api/bucketlist", async (req, res) => {
   const { completed } = req.query;
   try {
@@ -382,30 +383,35 @@ app.get("/api/bucketlist", async (req, res) => {
   }
 });
 
+// POST new bucketlist item
 app.post("/api/bucketlist", async (req, res) => {
   const {
     name,
-    emoji,
     country,
     latitude,
     longitude,
+    emoji,
     funfact,
     uniquething,
     iswishlist,
+    completed,
   } = req.body;
+
   try {
     await pool.query(
-      `INSERT INTO adventurebucketlist (name, emoji, country, latitude, longitude, funfact, uniquething, iswishlist)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8)`,
+      `INSERT INTO adventurebucketlist 
+       (name, country, latitude, longitude, emoji, funfact, uniquething, iswishlist, completed, createdat)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,NOW())`,
       [
         name,
-        emoji,
         country,
         latitude,
         longitude,
+        emoji,
         funfact,
         uniquething,
         !!iswishlist,
+        !!completed,
       ]
     );
     res.status(201).json({ message: "Bucket item added" });
@@ -415,33 +421,35 @@ app.post("/api/bucketlist", async (req, res) => {
   }
 });
 
+// PUT update bucketlist item
 app.put("/api/bucketlist/:id", async (req, res) => {
-  const id = toInt(req.params.id);
+  const id = parseInt(req.params.id, 10);
   const {
     name,
-    emoji,
     country,
     latitude,
     longitude,
+    emoji,
     funfact,
     uniquething,
-    completed,
     iswishlist,
+    completed,
   } = req.body;
+
   try {
     const q = `UPDATE adventurebucketlist 
-               SET name=$1, emoji=$2, country=$3, latitude=$4, longitude=$5, funfact=$6, uniquething=$7, completed=$8, iswishlist=$9
+               SET name=$1, country=$2, latitude=$3, longitude=$4, emoji=$5, funfact=$6, uniquething=$7, iswishlist=$8, completed=$9
                WHERE id=$10`;
     const vals = [
       name,
-      emoji,
       country,
       latitude,
       longitude,
+      emoji,
       funfact,
       uniquething,
-      completed,
-      iswishlist,
+      !!iswishlist,
+      !!completed,
       id,
     ];
     await pool.query(q, vals);
@@ -452,8 +460,9 @@ app.put("/api/bucketlist/:id", async (req, res) => {
   }
 });
 
+// DELETE bucketlist item
 app.delete("/api/bucketlist/:id", async (req, res) => {
-  const id = toInt(req.params.id);
+  const id = parseInt(req.params.id, 10);
   try {
     await pool.query(`DELETE FROM adventurebucketlist WHERE id=$1`, [id]);
     res.json({ message: "Bucket list item deleted" });
