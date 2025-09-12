@@ -3,7 +3,6 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const pool = require("./db");
 const multer = require("multer");
-const bcrypt = require("bcrypt");
 const { Readable } = require("stream");
 
 const upload = multer({ storage: multer.memoryStorage() });
@@ -46,26 +45,29 @@ app.post("/api/admin", async (req, res) => {
 app.get("/api/auth", async (req, res) => {
   try {
     const result = await pool.query(
-      `SELECT id, username, email, phone, role FROM logintable ORDER BY id ASC`
+      "SELECT id, username, email, phone, role FROM logintable"
     );
     res.status(200).json(result.rows);
   } catch (err) {
-    console.error("Fetch users error:", err.message);
+    console.error(err);
     res.status(500).json({ message: "Server error" });
   }
 });
 
-// Signup
 app.post("/api/auth", async (req, res) => {
   const { action, username, password, email, phone } = req.body;
-
   try {
-    if (action === "signup") {
-      if (!username || !password)
-        return res
-          .status(400)
-          .json({ message: "Username and password required" });
+    if (action === "login") {
+      const result = await pool.query(
+        `SELECT * FROM logintable WHERE username = $1 AND password = $2`,
+        [username, password]
+      );
+      if (!result.rows.length)
+        return res.status(401).json({ message: "Invalid credentials" });
+      return res.status(200).json({ user: result.rows[0], role: "user" });
+    }
 
+    if (action === "signup") {
       const exists = await pool.query(
         `SELECT 1 FROM logintable WHERE username = $1`,
         [username]
@@ -73,45 +75,20 @@ app.post("/api/auth", async (req, res) => {
       if (exists.rows.length)
         return res.status(400).json({ message: "Username already exists" });
 
-      const hashedPassword = await bcrypt.hash(password, 10);
-
-      const newUser = await pool.query(
-        `INSERT INTO logintable (username, password, email, phone, role) 
-         VALUES ($1, $2, $3, $4, 'user')
-         RETURNING id, username, email, phone, role`,
-        [username, hashedPassword, email || "", phone || ""]
+      await pool.query(
+        `INSERT INTO logintable (username, password, email, phone, role) VALUES ($1, $2, $3, $4, 'user')`,
+        [username, password, email, phone]
       );
-
-      return res.status(201).json({ user: newUser.rows[0] });
-    }
-
-    if (action === "login") {
-      if (!username || !password)
-        return res
-          .status(400)
-          .json({ message: "Username and password required" });
-
-      const result = await pool.query(
-        `SELECT id, username, password, email, phone, role FROM logintable WHERE username = $1`,
+      const newUser = await pool.query(
+        `SELECT * FROM logintable WHERE username = $1`,
         [username]
       );
-
-      if (!result.rows.length)
-        return res.status(401).json({ message: "Invalid credentials" });
-
-      const user = result.rows[0];
-      const isMatch = await bcrypt.compare(password, user.password);
-
-      if (!isMatch)
-        return res.status(401).json({ message: "Invalid credentials" });
-
-      delete user.password; // don't send password back
-      return res.status(200).json({ user });
+      return res.status(200).json({ user: newUser.rows[0], role: "user" });
     }
 
     return res.status(400).json({ message: "Invalid action" });
   } catch (err) {
-    console.error("Auth error:", err);
+    console.error(err);
     res.status(500).json({ message: "Server error" });
   }
 });
