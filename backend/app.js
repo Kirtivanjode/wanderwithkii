@@ -3,6 +3,7 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const pool = require("./db");
 const multer = require("multer");
+const bcrypt = require("bcrypt");
 const { Readable } = require("stream");
 
 const upload = multer({ storage: multer.memoryStorage() });
@@ -53,8 +54,6 @@ app.get("/api/auth", async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
-
-const bcrypt = require("bcrypt");
 
 // Signup
 app.post("/api/auth", async (req, res) => {
