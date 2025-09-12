@@ -75,6 +75,12 @@ app.post("/api/auth", async (req, res) => {
       if (exists.rows.length)
         return res.status(400).json({ message: "Username already exists" });
 
+      console.log("New user signup:", {
+        username,
+        email,
+        phone,
+      });
+
       await pool.query(
         `INSERT INTO logintable (username, password, email, phone, role) VALUES ($1, $2, $3, $4, '$5')`,
         [username, password, email, phone]
