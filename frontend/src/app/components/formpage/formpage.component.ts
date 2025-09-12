@@ -48,7 +48,7 @@ export class FormpageComponent implements OnInit {
       next: (res) => {
         const user = {
           ...res.user,
-          role: res.role || 'user',
+          role: res || 'user',
         };
         this.authService.setUser(user);
         this.router.navigateByUrl(this.returnUrl);
@@ -62,7 +62,7 @@ export class FormpageComponent implements OnInit {
       next: (res) => {
         const user = {
           ...res.user,
-          role: res.role || 'user',
+          role: res || 'user',
         };
         this.authService.setUser(user);
         this.router.navigateByUrl(this.returnUrl);

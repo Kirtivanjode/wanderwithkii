@@ -16,7 +16,7 @@ export class BlogService {
   constructor(private http: HttpClient) {}
 
   login(data: { username: string; password: string }) {
-    return this.http.post<{ user: any; role: string }>(`${this.baseUrl}/auth`, {
+    return this.http.post<{ user: any }>(`${this.baseUrl}/auth`, {
       ...data,
       action: 'login',
     });
@@ -28,7 +28,7 @@ export class BlogService {
     email: string;
     phone: string;
   }) {
-    return this.http.post<{ user: any; role: string }>(`${this.baseUrl}/auth`, {
+    return this.http.post<{ user: any }>(`${this.baseUrl}/auth`, {
       ...data,
       action: 'signup',
     });
