@@ -26,61 +26,47 @@ const toInt = (v) => (typeof v === "string" ? parseInt(v, 10) : v);
 
 app.post("/api/admin", async (req, res) => {
   const { username, password } = req.body;
-
-  if (!username || !password) {
-    return res.status(400).json({ message: "Username and password required" });
-  }
-
   try {
     const result = await pool.query(
-      `SELECT id, username, email, phone, role 
-       FROM logintable 
-       WHERE username = $1 AND password = $2 AND role = 'admin'`,
+      `SELECT * FROM users WHERE username = $1 AND password = $2`,
       [username, password]
     );
-
-    if (!result.rows.length) {
-      return res.status(401).json({ message: "Invalid admin credentials" });
+    if (result.rows.length > 0) {
+      res.status(200).json({ user: result.rows[0], role: "admin" });
+    } else {
+      res.status(401).json({ message: "Invalid admin credentials" });
     }
-
-    res.status(200).json({ user: result.rows[0], role: "admin" });
   } catch (err) {
-    console.error("Admin login error:", err.message);
+    console.error(err);
     res.status(500).json({ message: "Server error" });
   }
 });
 
-// app.get("/api/auth", async (req, res) => {
-//   try {
-//     const result = await pool.query(
-//       `SELECT id, username, email, phone, role FROM logintable ORDER BY id ASC`
-//     );
-//     res.status(200).json(result.rows);
-//   } catch (err) {
-//     console.error("Fetch users error:", err.message);
-//     res.status(500).json({ message: "Server error" });
-//   }
-// });
+app.get("/api/auth", async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT id, username, email, phone, role FROM logintable ORDER BY id ASC`
+    );
+    res.status(200).json(result.rows);
+  } catch (err) {
+    console.error("Fetch users error:", err.message);
+    res.status(500).json({ message: "Server error" });
+  }
+});
 
+const bcrypt = require("bcrypt");
+
+// Signup
 app.post("/api/auth", async (req, res) => {
   const { action, username, password, email, phone } = req.body;
 
-  console.log("Incoming auth request:", req.body);
-
   try {
-    if (action === "login") {
-      const result = await pool.query(
-        `SELECT id, username, email, phone, role 
-         FROM logintable WHERE username = $1 AND password = $2`,
-        [username, password]
-      );
-      if (!result.rows.length)
-        return res.status(401).json({ message: "Invalid credentials" });
-
-      return res.status(200).json({ user: result.rows[0] });
-    }
-
     if (action === "signup") {
+      if (!username || !password)
+        return res
+          .status(400)
+          .json({ message: "Username and password required" });
+
       const exists = await pool.query(
         `SELECT 1 FROM logintable WHERE username = $1`,
         [username]
@@ -88,20 +74,46 @@ app.post("/api/auth", async (req, res) => {
       if (exists.rows.length)
         return res.status(400).json({ message: "Username already exists" });
 
+      const hashedPassword = await bcrypt.hash(password, 10);
+
       const newUser = await pool.query(
         `INSERT INTO logintable (username, password, email, phone, role) 
          VALUES ($1, $2, $3, $4, 'user')
          RETURNING id, username, email, phone, role`,
-        [username, password, email || "", phone || ""]
+        [username, hashedPassword, email || "", phone || ""]
       );
 
       return res.status(201).json({ user: newUser.rows[0] });
     }
 
+    if (action === "login") {
+      if (!username || !password)
+        return res
+          .status(400)
+          .json({ message: "Username and password required" });
+
+      const result = await pool.query(
+        `SELECT id, username, password, email, phone, role FROM logintable WHERE username = $1`,
+        [username]
+      );
+
+      if (!result.rows.length)
+        return res.status(401).json({ message: "Invalid credentials" });
+
+      const user = result.rows[0];
+      const isMatch = await bcrypt.compare(password, user.password);
+
+      if (!isMatch)
+        return res.status(401).json({ message: "Invalid credentials" });
+
+      delete user.password; // don't send password back
+      return res.status(200).json({ user });
+    }
+
     return res.status(400).json({ message: "Invalid action" });
   } catch (err) {
-    console.error("Auth API error:", err); // 👈 this will print full error
-    res.status(500).json({ message: "Server error", error: err.message });
+    console.error("Auth error:", err);
+    res.status(500).json({ message: "Server error" });
   }
 });
 
