@@ -75,20 +75,19 @@ app.post("/api/auth", async (req, res) => {
       if (exists.rows.length)
         return res.status(400).json({ message: "Username already exists" });
 
-      console.log("New user signup:", {
-        username,
-        email,
-        phone,
-      });
+      // Log signup data (without password for security)
+      console.log("New user signing up:", { username, email, phone });
 
       await pool.query(
-        `INSERT INTO logintable (username, password, email, phone, role) VALUES ($1, $2, $3, $4, '$5')`,
-        [username, password, email, phone]
+        `INSERT INTO logintable (username, password, email, phone, role) VALUES ($1, $2, $3, $4, $5)`,
+        [username, password, email, phone, "user"]
       );
+
       const newUser = await pool.query(
         `SELECT * FROM logintable WHERE username = $1`,
         [username]
       );
+
       return res.status(200).json({ user: newUser.rows[0], role: "user" });
     }
 
