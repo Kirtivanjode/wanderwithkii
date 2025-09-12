@@ -26,18 +26,26 @@ const toInt = (v) => (typeof v === "string" ? parseInt(v, 10) : v);
 
 app.post("/api/admin", async (req, res) => {
   const { username, password } = req.body;
+
+  if (!username || !password) {
+    return res.status(400).json({ message: "Username and password required" });
+  }
+
   try {
     const result = await pool.query(
-      `SELECT * FROM users WHERE username = $1 AND password = $2`,
+      `SELECT id, username, email, phone, role 
+       FROM logintable 
+       WHERE username = $1 AND password = $2 AND role = 'admin'`,
       [username, password]
     );
-    if (result.rows.length > 0) {
-      res.status(200).json({ user: result.rows[0], role: "admin" });
-    } else {
-      res.status(401).json({ message: "Invalid admin credentials" });
+
+    if (!result.rows.length) {
+      return res.status(401).json({ message: "Invalid admin credentials" });
     }
+
+    res.status(200).json({ user: result.rows[0], role: "admin" });
   } catch (err) {
-    console.error(err);
+    console.error("Admin login error:", err.message);
     res.status(500).json({ message: "Server error" });
   }
 });
@@ -45,26 +53,31 @@ app.post("/api/admin", async (req, res) => {
 app.get("/api/auth", async (req, res) => {
   try {
     const result = await pool.query(
-      "SELECT id, username, email, phone, role FROM logintable"
+      `SELECT id, username, email, phone, role FROM logintable ORDER BY id ASC`
     );
     res.status(200).json(result.rows);
   } catch (err) {
-    console.error(err);
+    console.error("Fetch users error:", err.message);
     res.status(500).json({ message: "Server error" });
   }
 });
 
 app.post("/api/auth", async (req, res) => {
   const { action, username, password, email, phone } = req.body;
+
+  console.log("Incoming auth request:", req.body);
+
   try {
     if (action === "login") {
       const result = await pool.query(
-        `SELECT * FROM logintable WHERE username = $1 AND password = $2`,
+        `SELECT id, username, email, phone, role 
+         FROM logintable WHERE username = $1 AND password = $2`,
         [username, password]
       );
       if (!result.rows.length)
         return res.status(401).json({ message: "Invalid credentials" });
-      return res.status(200).json({ user: result.rows[0], role: "user" });
+
+      return res.status(200).json({ user: result.rows[0] });
     }
 
     if (action === "signup") {
@@ -75,21 +88,20 @@ app.post("/api/auth", async (req, res) => {
       if (exists.rows.length)
         return res.status(400).json({ message: "Username already exists" });
 
-      await pool.query(
-        `INSERT INTO logintable (username, password, email, phone, role) VALUES ($1, $2, $3, $4, 'user')`,
-        [username, password, email, phone]
-      );
       const newUser = await pool.query(
-        `SELECT * FROM logintable WHERE username = $1`,
-        [username]
+        `INSERT INTO logintable (username, password, email, phone, role) 
+         VALUES ($1, $2, $3, $4, 'user')
+         RETURNING id, username, email, phone, role`,
+        [username, password, email || "", phone || ""]
       );
-      return res.status(200).json({ user: newUser.rows[0], role: "user" });
+
+      return res.status(201).json({ user: newUser.rows[0] });
     }
 
     return res.status(400).json({ message: "Invalid action" });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Server error" });
+    console.error("Auth API error:", err); // 👈 this will print full error
+    res.status(500).json({ message: "Server error", error: err.message });
   }
 });
 
@@ -364,7 +376,6 @@ app.delete("/api/comments/:id", async (req, res) => {
   }
 });
 
-// GET all bucketlist items
 app.get("/api/bucketlist", async (req, res) => {
   const { completed } = req.query;
   try {
@@ -383,35 +394,30 @@ app.get("/api/bucketlist", async (req, res) => {
   }
 });
 
-// POST new bucketlist item
 app.post("/api/bucketlist", async (req, res) => {
   const {
     name,
+    emoji,
     country,
     latitude,
     longitude,
-    emoji,
     funfact,
     uniquething,
     iswishlist,
-    completed,
   } = req.body;
-
   try {
     await pool.query(
-      `INSERT INTO adventurebucketlist 
-       (name, country, latitude, longitude, emoji, funfact, uniquething, iswishlist, completed, createdat)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,NOW())`,
+      `INSERT INTO adventurebucketlist (name, emoji, country, latitude, longitude, funfact, uniquething, iswishlist)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8)`,
       [
         name,
+        emoji,
         country,
         latitude,
         longitude,
-        emoji,
         funfact,
         uniquething,
         !!iswishlist,
-        !!completed,
       ]
     );
     res.status(201).json({ message: "Bucket item added" });
@@ -421,48 +427,24 @@ app.post("/api/bucketlist", async (req, res) => {
   }
 });
 
-// PUT update bucketlist item
-app.put("/api/bucketlist/:id", async (req, res) => {
+app.put("/api/bucketlist/:id/toggle", async (req, res) => {
   const id = parseInt(req.params.id, 10);
-  const {
-    name,
-    country,
-    latitude,
-    longitude,
-    emoji,
-    funfact,
-    uniquething,
-    iswishlist,
-    completed,
-  } = req.body;
-
   try {
-    const q = `UPDATE adventurebucketlist 
-               SET name=$1, country=$2, latitude=$3, longitude=$4, emoji=$5, funfact=$6, uniquething=$7, iswishlist=$8, completed=$9
-               WHERE id=$10`;
-    const vals = [
-      name,
-      country,
-      latitude,
-      longitude,
-      emoji,
-      funfact,
-      uniquething,
-      !!iswishlist,
-      !!completed,
-      id,
-    ];
-    await pool.query(q, vals);
-    res.json({ message: "Bucket list item updated" });
+    await pool.query(
+      `UPDATE adventurebucketlist
+       SET completed = NOT completed
+       WHERE id=$1`,
+      [id]
+    );
+    res.json({ message: "Completed status toggled" });
   } catch (err) {
-    console.error("Failed to update bucket item:", err);
-    res.status(500).json({ message: "Failed to update bucket item" });
+    console.error("Failed to toggle completed:", err);
+    res.status(500).json({ message: "Failed to toggle completed" });
   }
 });
 
-// DELETE bucketlist item
 app.delete("/api/bucketlist/:id", async (req, res) => {
-  const id = parseInt(req.params.id, 10);
+  const id = toInt(req.params.id);
   try {
     await pool.query(`DELETE FROM adventurebucketlist WHERE id=$1`, [id]);
     res.json({ message: "Bucket list item deleted" });
