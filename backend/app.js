@@ -59,17 +59,15 @@ app.post("/api/auth", async (req, res) => {
   const { action, username, password, email, phone } = req.body;
 
   try {
-    if (!action || !["login", "signup"].includes(action)) {
+    if (!action || !["login", "signup"].includes(action))
       return res.status(400).json({ message: "Invalid action" });
-    }
 
-    if (!username || !password) {
+    if (!username || !password)
       return res
         .status(400)
         .json({ message: "Username and password required" });
-    }
 
-    // LOGIN
+    // ----- LOGIN -----
     if (action === "login") {
       const userRes = await pool.query(
         `SELECT * FROM logintable WHERE username=$1`,
@@ -94,13 +92,15 @@ app.post("/api/auth", async (req, res) => {
       });
     }
 
-    // SIGNUP
+    // ----- SIGNUP -----
     if (action === "signup") {
+      // Validate email & phone
       if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
         return res.status(400).json({ message: "Invalid email" });
       if (!phone || !/^\d{10}$/.test(phone))
         return res.status(400).json({ message: "Invalid phone" });
 
+      // Check if username/email already exists
       const existsRes = await pool.query(
         `SELECT 1 FROM logintable WHERE username=$1 OR email=$2`,
         [username, email]
@@ -110,10 +110,14 @@ app.post("/api/auth", async (req, res) => {
           .status(400)
           .json({ message: "Username or email already exists" });
 
+      // Hash password
       const hashedPassword = await bcrypt.hash(password, 10);
 
+      // Insert user
       const insertRes = await pool.query(
-        `INSERT INTO logintable (username, password, email, phone, role) VALUES ($1,$2,$3,$4,$5) RETURNING id, username, email, phone, role`,
+        `INSERT INTO logintable (username, password, email, phone, role)
+         VALUES ($1,$2,$3,$4,$5)
+         RETURNING id, username, email, phone, role`,
         [username, hashedPassword, email, phone, "user"]
       );
 
@@ -122,7 +126,7 @@ app.post("/api/auth", async (req, res) => {
     }
   } catch (err) {
     console.error("Auth route error:", err);
-    res.status(500).json({ message: "Server error" });
+    return res.status(500).json({ message: "Server error" });
   }
 });
 
