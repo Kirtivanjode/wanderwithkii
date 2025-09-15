@@ -55,13 +55,19 @@ app.get("/api/auth", async (req, res) => {
 });
 
 app.post("/api/auth", async (req, res) => {
+  console.log("Request body:", req.body);
   const { action, username, password, email, phone } = req.body;
+
   try {
+    if (!action || !username || !password)
+      return res.status(400).json({ message: "Missing fields" });
+
     if (action === "login") {
       const result = await pool.query(
-        `SELECT * FROM logintable WHERE username = $1 AND password = $2`,
+        `SELECT * FROM logintable WHERE username=$1 AND password=$2`,
         [username, password]
       );
+      console.log("Login query result:", result.rows);
       if (!result.rows.length)
         return res.status(401).json({ message: "Invalid credentials" });
       return res.status(200).json({ user: result.rows[0], role: "user" });
@@ -69,37 +75,30 @@ app.post("/api/auth", async (req, res) => {
 
     if (action === "signup") {
       const exists = await pool.query(
-        `SELECT 1 FROM logintable WHERE username = $1`,
+        `SELECT 1 FROM logintable WHERE username=$1`,
         [username]
       );
+      console.log("Signup exists check:", exists.rows);
       if (exists.rows.length)
-        return res.status(400).json({ message: "Username already exists" });
-
-      // Log signup data (without password for security)
-      console.log("New user signing up:", { username, email, phone });
+        return res.status(400).json({ message: "Username exists" });
 
       await pool.query(
-        `INSERT INTO logintable (username, password, email, phone, role) VALUES ($1, $2, $3, $4, $5)`,
+        `INSERT INTO logintable (username,password,email,phone,role) VALUES ($1,$2,$3,$4,$5)`,
         [username, password, email, phone, "user"]
       );
 
       const newUser = await pool.query(
-        `SELECT * FROM logintable WHERE username = $1`,
+        `SELECT * FROM logintable WHERE username=$1`,
         [username]
       );
-
       return res.status(200).json({ user: newUser.rows[0], role: "user" });
     }
 
-    return res.status(400).json({ message: "Invalid action" });
+    res.status(400).json({ message: "Invalid action" });
   } catch (err) {
-    console.error(err);
+    console.error("Auth route error:", err.stack);
     res.status(500).json({ message: "Server error" });
   }
-});
-app.get("/test-log", (req, res) => {
-  console.log("Test route hit!");
-  res.send("Check console");
 });
 
 app.get("/api/images/:id", async (req, res) => {
