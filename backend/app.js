@@ -4,7 +4,7 @@ const cors = require("cors");
 const pool = require("./db");
 const multer = require("multer");
 const { Readable } = require("stream");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 
 const upload = multer({ storage: multer.memoryStorage() });
 const app = express();
