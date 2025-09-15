@@ -55,49 +55,38 @@ app.get("/api/auth", async (req, res) => {
 });
 
 app.post("/api/auth", async (req, res) => {
-  console.log("Request body:", req.body);
-  const { action, username, password, email, phone } = req.body;
+  const { username, password, email, phone } = req.body;
+
+  if (!username || !password || !email || !phone) {
+    return res.status(400).json({ message: "All fields are required" });
+  }
 
   try {
-    if (!action || !username || !password)
-      return res.status(400).json({ message: "Missing fields" });
+    // Check if username already exists
+    const exists = await pool.query(
+      `SELECT 1 FROM logintable WHERE username = $1`,
+      [username]
+    );
 
-    if (action === "login") {
-      const result = await pool.query(
-        `SELECT * FROM logintable WHERE username=$1 AND password=$2`,
-        [username, password]
-      );
-      console.log("Login query result:", result.rows);
-      if (!result.rows.length)
-        return res.status(401).json({ message: "Invalid credentials" });
-      return res.status(200).json({ user: result.rows[0], role: "user" });
+    if (exists.rows.length) {
+      return res.status(400).json({ message: "Username already exists" });
     }
 
-    if (action === "signup") {
-      const exists = await pool.query(
-        `SELECT 1 FROM logintable WHERE username=$1`,
-        [username]
-      );
-      console.log("Signup exists check:", exists.rows);
-      if (exists.rows.length)
-        return res.status(400).json({ message: "Username exists" });
+    // Insert new user
+    await pool.query(
+      `INSERT INTO logintable (username, password, email, phone, role) VALUES ($1, $2, $3, $4, $5)`,
+      [username, password, email, phone, "user"]
+    );
 
-      await pool.query(
-        `INSERT INTO logintable (username,password,email,phone,role) VALUES ($1,$2,$3,$4,$5)`,
-        [username, password, email, phone, "user"]
-      );
+    // Fetch the newly created user
+    const newUser = await pool.query(
+      `SELECT * FROM logintable WHERE username = $1`,
+      [username]
+    );
 
-      const newUser = await pool.query(
-        `SELECT * FROM logintable WHERE username=$1`,
-        [username]
-      );
-      return res.status(200).json({ user: newUser.rows[0], role: "user" });
-    }
-
-    res.status(400).json({ message: "Invalid action" });
+    return res.status(201).json({ user: newUser.rows[0], role: "user" });
   } catch (err) {
-    console.error("Auth route error:", err.stack);
-    res.status(500).json({ message: "Server error" });
+    return res.status(500).json({ message: "Server error" });
   }
 });
 
