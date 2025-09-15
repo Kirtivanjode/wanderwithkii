@@ -56,77 +56,32 @@ app.get("/api/auth", async (req, res) => {
 });
 
 app.post("/api/auth", async (req, res) => {
-  const { action, username, password, email, phone } = req.body;
-
   try {
-    if (!action || !["login", "signup"].includes(action))
-      return res.status(400).json({ message: "Invalid action" });
+    console.log("Signup request body:", req.body); // log what is coming from frontend
+    const { username, email, phone, password } = req.body;
 
-    if (!username || !password)
-      return res
-        .status(400)
-        .json({ message: "Username and password required" });
+    // Example: check if email exists
+    const existingUser = await pool.query(
+      "SELECT * FROM users WHERE email = $1",
+      [email]
+    );
+    console.log("Existing user:", existingUser.rows);
 
-    // ----- LOGIN -----
-    if (action === "login") {
-      const userRes = await pool.query(
-        `SELECT * FROM logintable WHERE username=$1`,
-        [username]
-      );
-      if (!userRes.rows.length)
-        return res.status(401).json({ message: "Invalid credentials" });
-
-      const user = userRes.rows[0];
-      const validPassword = await bcrypt.compare(password, user.password);
-      if (!validPassword)
-        return res.status(401).json({ message: "Invalid credentials" });
-
-      return res.status(200).json({
-        user: {
-          id: user.id,
-          username: user.username,
-          email: user.email,
-          phone: user.phone,
-        },
-        role: user.role,
-      });
+    if (existingUser.rows.length > 0) {
+      return res.status(400).json({ message: "Email already exists" });
     }
 
-    // ----- SIGNUP -----
-    if (action === "signup") {
-      // Validate email & phone
-      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
-        return res.status(400).json({ message: "Invalid email" });
-      if (!phone || !/^\d{10}$/.test(phone))
-        return res.status(400).json({ message: "Invalid phone" });
+    // Insert user
+    const newUser = await pool.query(
+      "INSERT INTO users (username, email, phone, password) VALUES ($1, $2, $3, $4) RETURNING *",
+      [username, email, phone, password]
+    );
 
-      // Check if username/email already exists
-      const existsRes = await pool.query(
-        `SELECT 1 FROM logintable WHERE username=$1 OR email=$2`,
-        [username, email]
-      );
-      if (existsRes.rows.length)
-        return res
-          .status(400)
-          .json({ message: "Username or email already exists" });
-
-      // Hash password
-      const hashedPassword = await bcrypt.hash(password, 10);
-
-      // Insert user
-      const insertRes = await pool.query(
-        `INSERT INTO logintable (username, password, email, phone, role)
-         VALUES ($1,$2,$3,$4,$5)
-         RETURNING id, username, email, phone, role`,
-        [username, hashedPassword, email, phone, "user"]
-      );
-
-      const newUser = insertRes.rows[0];
-      return res.status(201).json({ user: newUser, role: newUser.role });
-    }
+    console.log("User created:", newUser.rows[0]);
+    res.json(newUser.rows[0]);
   } catch (err) {
-    console.error("Auth route error:", err);
-    return res.status(500).json({ message: "Server error" });
+    console.error("Error in /api/auth:", err.message); // log error to terminal
+    res.status(500).json({ error: err.message });
   }
 });
 
