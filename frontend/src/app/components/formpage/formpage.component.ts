@@ -65,9 +65,13 @@ export class FormpageComponent implements OnInit {
           role: res || 'user',
         };
         this.authService.setUser(user);
-        this.router.navigateByUrl(this.returnUrl);
+
+        this.router.navigateByUrl('/');
+        this.toastr.success('Sign up successful!');
       },
-      error: (err) => this.toastr.error(err.error?.message || 'Signup failed'),
+      error: (err) => {
+        this.toastr.error(err.error?.message || 'Sign up failed');
+      },
     });
   }
 }
