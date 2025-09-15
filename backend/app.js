@@ -4,7 +4,6 @@ const cors = require("cors");
 const pool = require("./db");
 const multer = require("multer");
 const { Readable } = require("stream");
-const bcrypt = require("bcryptjs");
 
 const upload = multer({ storage: multer.memoryStorage() });
 const app = express();
@@ -56,33 +55,51 @@ app.get("/api/auth", async (req, res) => {
 });
 
 app.post("/api/auth", async (req, res) => {
+  const { action, username, password, email, phone } = req.body;
   try {
-    console.log("Signup request body:", req.body); // log what is coming from frontend
-    const { username, email, phone, password } = req.body;
-
-    // Example: check if email exists
-    const existingUser = await pool.query(
-      "SELECT * FROM users WHERE email = $1",
-      [email]
-    );
-    console.log("Existing user:", existingUser.rows);
-
-    if (existingUser.rows.length > 0) {
-      return res.status(400).json({ message: "Email already exists" });
+    if (action === "login") {
+      const result = await pool.query(
+        `SELECT * FROM logintable WHERE username = $1 AND password = $2`,
+        [username, password]
+      );
+      if (!result.rows.length)
+        return res.status(401).json({ message: "Invalid credentials" });
+      return res.status(200).json({ user: result.rows[0], role: "user" });
     }
 
-    // Insert user
-    const newUser = await pool.query(
-      "INSERT INTO users (username, email, phone, password) VALUES ($1, $2, $3, $4) RETURNING *",
-      [username, email, phone, password]
-    );
+    if (action === "signup") {
+      const exists = await pool.query(
+        `SELECT 1 FROM logintable WHERE username = $1`,
+        [username]
+      );
+      if (exists.rows.length)
+        return res.status(400).json({ message: "Username already exists" });
 
-    console.log("User created:", newUser.rows[0]);
-    res.json(newUser.rows[0]);
+      // Log signup data (without password for security)
+      console.log("New user signing up:", { username, email, phone });
+
+      await pool.query(
+        `INSERT INTO logintable (username, password, email, phone, role) VALUES ($1, $2, $3, $4, $5)`,
+        [username, password, email, phone, "user"]
+      );
+
+      const newUser = await pool.query(
+        `SELECT * FROM logintable WHERE username = $1`,
+        [username]
+      );
+
+      return res.status(200).json({ user: newUser.rows[0], role: "user" });
+    }
+
+    return res.status(400).json({ message: "Invalid action" });
   } catch (err) {
-    console.error("Error in /api/auth:", err.message); // log error to terminal
-    res.status(500).json({ error: err.message });
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
   }
+});
+app.get("/test-log", (req, res) => {
+  console.log("Test route hit!");
+  res.send("Check console");
 });
 
 app.get("/api/images/:id", async (req, res) => {
