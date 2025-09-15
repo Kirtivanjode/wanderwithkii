@@ -44,6 +44,10 @@ export class SettingsComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    if (window.innerWidth <= 768) {
+      this.sidebarOpen = false;
+    }
+
     const storedUser = sessionStorage.getItem('user');
     if (storedUser) {
       const userData = JSON.parse(storedUser);
