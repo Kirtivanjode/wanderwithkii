@@ -54,7 +54,8 @@ app.get("/api/auth", async (req, res) => {
   }
 });
 
-app.post("/api/auth", async (req, res) => {
+// SIGNUP
+app.post("/api/signup", async (req, res) => {
   const { username, password, email, phone } = req.body;
 
   if (!username || !password || !email || !phone) {
@@ -64,27 +65,50 @@ app.post("/api/auth", async (req, res) => {
   try {
     // Check if username already exists
     const exists = await pool.query(
-      `SELECT 1 FROM logintable WHERE username = $1`,
+      `SELECT 1 FROM logintable WHERE username=$1`,
       [username]
     );
-
     if (exists.rows.length) {
       return res.status(400).json({ message: "Username already exists" });
     }
 
     // Insert new user
     await pool.query(
-      `INSERT INTO logintable (username, password, email, phone, role) VALUES ($1, $2, $3, $4, $5)`,
+      `INSERT INTO logintable (username,password,email,phone,role) VALUES ($1,$2,$3,$4,$5)`,
       [username, password, email, phone, "user"]
     );
 
-    // Fetch the newly created user
+    // Fetch newly created user
     const newUser = await pool.query(
-      `SELECT * FROM logintable WHERE username = $1`,
+      `SELECT * FROM logintable WHERE username=$1`,
       [username]
     );
 
     return res.status(201).json({ user: newUser.rows[0], role: "user" });
+  } catch (err) {
+    return res.status(500).json({ message: "Server error" });
+  }
+});
+
+// LOGIN
+app.post("/api/login", async (req, res) => {
+  const { username, password } = req.body;
+
+  if (!username || !password) {
+    return res.status(400).json({ message: "Username and password required" });
+  }
+
+  try {
+    const result = await pool.query(
+      `SELECT * FROM logintable WHERE username=$1 AND password=$2`,
+      [username, password]
+    );
+
+    if (!result.rows.length) {
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
+
+    return res.status(200).json({ user: result.rows[0], role: "user" });
   } catch (err) {
     return res.status(500).json({ message: "Server error" });
   }
