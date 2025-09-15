@@ -54,64 +54,52 @@ app.get("/api/auth", async (req, res) => {
   }
 });
 
-// SIGNUP
-app.post("/api/signup", async (req, res) => {
-  const { username, password, email, phone } = req.body;
-
-  if (!username || !password || !email || !phone) {
-    return res.status(400).json({ message: "All fields are required" });
-  }
-
+app.post("/api/auth", async (req, res) => {
+  const { action, username, password, email, phone } = req.body;
   try {
-    // Check if username already exists
-    const exists = await pool.query(
-      `SELECT 1 FROM logintable WHERE username=$1`,
-      [username]
-    );
-    if (exists.rows.length) {
-      return res.status(400).json({ message: "Username already exists" });
+    if (action === "login") {
+      const result = await pool.query(
+        `SELECT * FROM logintable WHERE username = $1 AND password = $2`,
+        [username, password]
+      );
+      if (!result.rows.length)
+        return res.status(401).json({ message: "Invalid credentials" });
+      return res.status(200).json({ user: result.rows[0], role: "user" });
     }
 
-    // Insert new user
-    await pool.query(
-      `INSERT INTO logintable (username,password,email,phone,role) VALUES ($1,$2,$3,$4,$5)`,
-      [username, password, email, phone, "user"]
-    );
+    if (action === "signup") {
+      const exists = await pool.query(
+        `SELECT 1 FROM logintable WHERE username = $1`,
+        [username]
+      );
+      if (exists.rows.length)
+        return res.status(400).json({ message: "Username already exists" });
 
-    // Fetch newly created user
-    const newUser = await pool.query(
-      `SELECT * FROM logintable WHERE username=$1`,
-      [username]
-    );
+      // Log signup data (without password for security)
+      console.log("New user signing up:", { username, email, phone });
 
-    return res.status(201).json({ user: newUser.rows[0], role: "user" });
+      await pool.query(
+        `INSERT INTO logintable (username, password, email, phone, role) VALUES ($1, $2, $3, $4, $5)`,
+        [username, password, email, phone, "user"]
+      );
+
+      const newUser = await pool.query(
+        `SELECT * FROM logintable WHERE username = $1`,
+        [username]
+      );
+
+      return res.status(200).json({ user: newUser.rows[0], role: "user" });
+    }
+
+    return res.status(400).json({ message: "Invalid action" });
   } catch (err) {
-    return res.status(500).json({ message: "Server error" });
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
   }
 });
-
-// LOGIN
-app.post("/api/login", async (req, res) => {
-  const { username, password } = req.body;
-
-  if (!username || !password) {
-    return res.status(400).json({ message: "Username and password required" });
-  }
-
-  try {
-    const result = await pool.query(
-      `SELECT * FROM logintable WHERE username=$1 AND password=$2`,
-      [username, password]
-    );
-
-    if (!result.rows.length) {
-      return res.status(401).json({ message: "Invalid credentials" });
-    }
-
-    return res.status(200).json({ user: result.rows[0], role: "user" });
-  } catch (err) {
-    return res.status(500).json({ message: "Server error" });
-  }
+app.get("/test-log", (req, res) => {
+  console.log("Test route hit!");
+  res.send("Check console");
 });
 
 app.get("/api/images/:id", async (req, res) => {
