@@ -188,13 +188,13 @@ button:disabled {
 
 @media (max-width: 768px) {
   .settings-sidebar {
-    width: 50%;
+    width: 45%;
     border-bottom: 1px solid #ccc;
     height: 65vh;
   }
 
   .settings-container:not(.collapsed) .sidebar-toggle {
-    left: calc(40% + 13px);
+    left: calc(40% + 17px);
   }
 
   .settings-container.collapsed .sidebar-toggle {
@@ -204,5 +204,17 @@ button:disabled {
   .settings-content {
     padding: 20px;
     height: 65vh;
+  }
+}
+
+@media (max-width: 400px) {
+  .settings-sidebar {
+    width: 50%;
+    border-bottom: 1px solid #ccc;
+    height: 65vh;
+  }
+
+  .settings-container:not(.collapsed) .sidebar-toggle {
+    left: calc(40% + 13px);
   }
 }

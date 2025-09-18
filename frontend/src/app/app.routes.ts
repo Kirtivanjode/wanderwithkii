@@ -16,7 +16,7 @@ export const routes: Routes = [
   { path: 'food', component: FoodComponent },
   { path: 'destinations', component: DestinationComponent },
   { path: 'formpage', component: FormpageComponent },
-  { path: 'settings', component: SettingsComponent },
+  { path: 'settings', component: SettingsComponent, canActivate: [adminGuard] },
   { path: 'blog/:id', component: BlogComponent },
   { path: 'admin/formpage', component: AdminFormpageComponent },
 
