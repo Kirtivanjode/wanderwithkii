@@ -75,7 +75,6 @@ app.post("/api/auth", async (req, res) => {
       if (exists.rows.length)
         return res.status(400).json({ message: "Username already exists" });
 
-      // Log signup data (without password for security)
       console.log("New user signing up:", { username, email, phone });
 
       await pool.query(
@@ -96,10 +95,6 @@ app.post("/api/auth", async (req, res) => {
     console.error(err);
     res.status(500).json({ message: "Server error" });
   }
-});
-app.get("/test-log", (req, res) => {
-  console.log("Test route hit!");
-  res.send("Check console");
 });
 
 app.get("/api/images/:id", async (req, res) => {
