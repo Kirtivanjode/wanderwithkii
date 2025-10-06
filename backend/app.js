@@ -570,10 +570,9 @@ app.get("/api/adventures", async (req, res) => {
       location: item.Location,
       imageid: item.ImageId,
       imagename: item.imagename,
-      imagebase64:
-        item.imagedata instanceof Buffer
-          ? `data:image/jpeg;base64,${item.imagedata.toString("base64")}`
-          : null,
+      imagebase64: item.imagedata
+        ? `data:image/jpeg;base64,${item.imagedata.toString("base64")}`
+        : null,
     }));
 
     res.json(adventures);
