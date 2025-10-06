@@ -667,9 +667,22 @@ app.delete("/api/adventures/:id", async (req, res) => {
 app.get("/api/home", async (req, res) => {
   try {
     const result = await pool.query(
-      `SELECT ws.id, ws.type, ws.title, ws.description, ws.content1, ws.content2, ws.sort_order, ws.imageid, i.name AS imagename, i.imagedata
-       FROM websitesections ws LEFT JOIN images i ON ws.imageid = i.id ORDER BY ws.sort_order ASC`
+      `SELECT 
+         ws."id", 
+         ws."type", 
+         ws."title", 
+         ws."description", 
+         ws."content1", 
+         ws."content2", 
+         ws."sort_order", 
+         ws."imageid", 
+         i."Name" AS "imagename", 
+         i."imagedata"
+       FROM websitesections ws
+       LEFT JOIN images i ON ws."imageid" = i."id"
+       ORDER BY ws."sort_order" ASC`
     );
+
     const sections = result.rows.map((s) => ({
       id: s.id,
       type: s.type,
@@ -684,6 +697,7 @@ app.get("/api/home", async (req, res) => {
         ? `data:image/jpeg;base64,${s.imagedata.toString("base64")}`
         : null,
     }));
+
     res.json(sections);
   } catch (err) {
     console.error("Failed to fetch website sections:", err);
