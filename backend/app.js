@@ -124,19 +124,28 @@ app.get("/api/posts", async (req, res) => {
   const username = req.query.username || null;
   try {
     const query = `
-      SELECT p.id, p.title, p.summary, p.author, p.post_date, p.logoid, p.imageid,
-             (SELECT COUNT(*)::int FROM comments WHERE post_id = p.id) AS commentcount,
-             (SELECT COUNT(*)::int FROM postlikes WHERE post_id = p.id) AS likes,
-             CASE WHEN $1::text IS NOT NULL AND EXISTS(
-                 SELECT 1 FROM postlikes WHERE post_id = p.id AND username = $1
-             ) THEN true ELSE false END AS isliked
+      SELECT 
+        p.id,
+        p.title,
+        p.summary,
+        p.author,
+        p.post_date,
+        p.logoid,
+        p.imageid,
+        p.imagepath,
+        (SELECT COUNT(*)::int FROM comments WHERE post_id = p.id) AS commentcount,
+        (SELECT COUNT(*)::int FROM postlikes WHERE post_id = p.id) AS likes,
+        CASE WHEN $1::text IS NOT NULL AND EXISTS(
+          SELECT 1 FROM postlikes WHERE post_id = p.id AND username = $1
+        ) THEN true ELSE false END AS isliked
       FROM blogposts p
-      ORDER BY p.post_date DESC`;
+      ORDER BY p.post_date DESC;
+    `;
     const result = await pool.query(query, [username]);
     res.json(result.rows);
   } catch (err) {
-    console.error("Error fetching posts:", err);
-    res.status(500).json({ message: "Failed to load posts" });
+    console.error("Error fetching posts:", err.message);
+    res.status(500).json({ message: err.message });
   }
 });
 
