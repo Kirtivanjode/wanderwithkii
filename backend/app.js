@@ -458,14 +458,25 @@ app.delete("/api/bucketlist/:id", async (req, res) => {
 app.get("/api/fooditems", async (req, res) => {
   try {
     const result = await pool.query(
-      `SELECT f.id, f.name, f.description, f.location, f.rating, f.imageid, i.name AS imagename, i.imagedata
-       FROM fooditems f LEFT JOIN images i ON f.imageid = i.id ORDER BY f.id`
+      `SELECT 
+         f."id", 
+         f."Name", 
+         f."description", 
+         f."Location", 
+         f."rating", 
+         f."imageid", 
+         i."Name" AS "imagename", 
+         i."imagedata"
+       FROM fooditems f
+       LEFT JOIN images i ON f."imageid" = i."id"
+       ORDER BY f."id"`
     );
+
     const foodItems = result.rows.map((item) => ({
       id: item.id,
-      name: item.name,
+      name: item.Name,
       description: item.description,
-      location: item.location,
+      location: item.Location,
       rating: item.rating,
       imageid: item.imageid,
       imagename: item.imagename,
@@ -473,6 +484,7 @@ app.get("/api/fooditems", async (req, res) => {
         ? `data:image/jpeg;base64,${item.imagedata.toString("base64")}`
         : null,
     }));
+
     res.json(foodItems);
   } catch (err) {
     console.error("Error fetching food items:", err);
