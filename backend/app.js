@@ -550,20 +550,32 @@ app.delete("/api/fooditems/:id", async (req, res) => {
 app.get("/api/adventures", async (req, res) => {
   try {
     const result = await pool.query(
-      `SELECT a.id, a.name, a.description, a.location, a.imageid, i.name AS imagename, i.imagedata
-       FROM adventures a LEFT JOIN images i ON a.imageid = i.id ORDER BY a.id`
+      `SELECT 
+         a."id", 
+         a."Name", 
+         a."Description", 
+         a."Location", 
+         a."ImageId", 
+         i."name" AS "imagename", 
+         i."imagedata"
+       FROM adventures a
+       LEFT JOIN images i ON a."ImageId" = i.id
+       ORDER BY a."id"`
     );
+
     const adventures = result.rows.map((item) => ({
       id: item.id,
-      name: item.name,
-      description: item.description,
-      location: item.location,
-      imageid: item.imageid,
+      name: item.Name,
+      description: item.Description,
+      location: item.Location,
+      imageid: item.ImageId,
       imagename: item.imagename,
-      imagebase64: item.imagedata
-        ? `data:image/jpeg;base64,${item.imagedata.toString("base64")}`
-        : null,
+      imagebase64:
+        item.imagedata instanceof Buffer
+          ? `data:image/jpeg;base64,${item.imagedata.toString("base64")}`
+          : null,
     }));
+
     res.json(adventures);
   } catch (err) {
     console.error("Error fetching adventures:", err);
