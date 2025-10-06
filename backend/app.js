@@ -553,22 +553,22 @@ app.get("/api/adventures", async (req, res) => {
       `SELECT 
          a."id", 
          a."Name", 
-         a."Description", 
+         a."description", 
          a."Location", 
-         a."ImageId", 
-         i."name" AS "imagename", 
+         a."imageid", 
+         i."Name" AS "imagename", 
          i."imagedata"
        FROM adventures a
-       LEFT JOIN images i ON a."ImageId" = i.id
+       LEFT JOIN images i ON a."imageid" = i."id"
        ORDER BY a."id"`
     );
 
     const adventures = result.rows.map((item) => ({
       id: item.id,
       name: item.Name,
-      description: item.Description,
+      description: item.description,
       location: item.Location,
-      imageid: item.ImageId,
+      imageid: item.imageid,
       imagename: item.imagename,
       imagebase64: item.imagedata
         ? `data:image/jpeg;base64,${item.imagedata.toString("base64")}`
